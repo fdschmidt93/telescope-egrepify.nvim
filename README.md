@@ -81,7 +81,7 @@ to appropriately setup the plugin.
 You can call this extension with vimscript
 
 ```vim
-:Telscope egrepify
+:Telescope egrepify
 ```
 
 or lua
