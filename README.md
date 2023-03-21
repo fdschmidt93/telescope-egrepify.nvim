@@ -23,7 +23,7 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below pre
 -- filter for file suffixes
 -- example prompt: #lua,md $MY_PROMPT
 -- searches with ripgrep prompt $MY_PROMPT in files with extensions lua and md
--- i.e. rg --glob "*.{lua,md} -- $MY_PROMPT
+-- i.e. rg --glob="*.{lua,md}" -- $MY_PROMPT
 ["#"] = {
     flag = "glob",
     cb = function(input)
@@ -33,7 +33,7 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below pre
 -- filter for (partial) folder names
 -- example prompt: >conf $MY_PROMPT
 -- searches with ripgrep prompt $MY_PROMPT in paths that have "conf" in folder
--- i.e. rg --glob "**/conf*/** -- $MY_PROMPT
+-- i.e. rg --glob="**/conf*/**" -- $MY_PROMPT
 [">"] = {
     flag = "glob",
     cb = function(input)
@@ -43,7 +43,7 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below pre
 -- filter for (partial) folder names
 -- example prompt: &egrep $MY_PROMPT
 -- searches with ripgrep prompt $MY_PROMPT in paths that have "egrep" in file name
--- i.e. rg --glob "*egrep* -- $MY_PROMPT
+-- i.e. rg --glob="*egrep*" -- $MY_PROMPT
 ["&"] = {
     flag = "glob",
     cb = function(input)
@@ -76,6 +76,7 @@ require("telescope").setup {
         -- ADDED ! to invert matches
         -- example prompt: ! sorter
         -- matches all lines that do not comprise sorter
+        -- rg --invert-match -- sorter
         ["!"] = {
           flag = "invert-match",
         },
