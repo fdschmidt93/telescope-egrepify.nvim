@@ -19,22 +19,19 @@ local function line_display(entry, data, opts)
 	if opts.lnum or opts.col then
 		out[#out + 1] = {
 			lnum_col_str,
-			{
-				lnum_col_str,
-				function()
-					local hl_table = {}
-					if opts.lnum then
-						hl_table[#hl_table + 1] = { { 0, 4 }, opts.lnum_hl }
-					end
-					if opts.col then
-						hl_table[#hl_table + 1] = { { 5, #lnum_col_str }, opts.col_hl }
-					end
-					if vim.tbl_isempty(hl_table) then
-						return { { 0, 1 }, "Normal" }
-					end
-					return hl_table
-				end,
-			},
+			function()
+				local hl_table = {}
+				if opts.lnum then
+					hl_table[#hl_table + 1] = { { 0, 4 }, opts.lnum_hl }
+				end
+				if opts.col then
+					hl_table[#hl_table + 1] = { { opts.lnum and 5 or 0, #lnum_col_str }, opts.col_hl }
+				end
+				if vim.tbl_isempty(hl_table) then
+					return { { 0, 1 }, "Normal" }
+				end
+				return hl_table
+			end,
 		}
 	end
 	out[#out + 1] = {
