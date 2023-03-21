@@ -25,36 +25,44 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below pre
 -- example prompt: #lua,md $MY_PROMPT
 -- searches with ripgrep prompt $MY_PROMPT in files with extensions lua and md
 -- i.e. rg --glob="*.{lua,md}" -- $MY_PROMPT
-["#"] = {
-    -- #$REMAINDER
-    -- # is caught prefix
-    -- `input` becomes $REMAINDER
-    -- in the above example #lua,md -> input: lua,md
-    flag = "glob",
-    cb = function(input)
-        return string.format([[*.{%s}]], input)
-    end,
-},
--- filter for (partial) folder names
--- example prompt: >conf $MY_PROMPT
--- searches with ripgrep prompt $MY_PROMPT in paths that have "conf" in folder
--- i.e. rg --glob="**/conf*/**" -- $MY_PROMPT
-[">"] = {
-    flag = "glob",
-    cb = function(input)
-        return string.format([[**/{%s}*/**]], input)
-    end,
-},
--- filter for (partial) folder names
--- example prompt: &egrep $MY_PROMPT
--- searches with ripgrep prompt $MY_PROMPT in paths that have "egrep" in file name
--- i.e. rg --glob="*egrep*" -- $MY_PROMPT
-["&"] = {
-    flag = "glob",
-    cb = function(input)
-        return string.format([[*{%s}*]], input)
-    end,
+{ ["#"] = {
+      -- #$REMAINDER
+      -- # is caught prefix
+      -- `input` becomes $REMAINDER
+      -- in the above example #lua,md -> input: lua,md
+      flag = "glob",
+      cb = function(input)
+          return string.format([[*.{%s}]], input)
+      end,
+  },
+  -- filter for (partial) folder names
+  -- example prompt: >conf $MY_PROMPT
+  -- searches with ripgrep prompt $MY_PROMPT in paths that have "conf" in folder
+  -- i.e. rg --glob="**/conf*/**" -- $MY_PROMPT
+  [">"] = {
+      flag = "glob",
+      cb = function(input)
+          return string.format([[**/{%s}*/**]], input)
+      end,
+  },
+  -- filter for (partial) folder names
+  -- example prompt: &egrep $MY_PROMPT
+  -- searches with ripgrep prompt $MY_PROMPT in paths that have "egrep" in file name
+  -- i.e. rg --glob="*egrep*" -- $MY_PROMPT
+  ["&"] = {
+      flag = "glob",
+      cb = function(input)
+          return string.format([[*{%s}*]], input)
+      end,
+  }
 }
+```
+If you want to opt-out of a prefix you can set `prefix` or pass `prefix` to `opts` with the corresponding prefix character set to `false`:
+
+```lua
+-- opting out of file extension
+{ ["#"] = false }
+```
 
 See also `Configuration`.
 
