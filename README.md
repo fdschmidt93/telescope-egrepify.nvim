@@ -5,7 +5,7 @@ In brief, this [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim
 ## Features
 
 - Extensible prefix-based CLI parsing for `ripgrep`, e.g. by default `#md,lua sorter` would look for sorter in files with `md` or `lua` extensions
-- Custom entry maker to parse `ripgrep` json to separate filenames as "section titles", configure line and column numbers, and perform accurate line highlighting
+- Custom entry maker to parse `ripgrep` json to separate filenames as "section titles" (inspired by [consult.el](https://github.com/minad/consult)), configure line and column numbers, and perform accurate line highlighting
 - Usable defaults the author likes like `AND` operator for tokens in prompt
 
 ## Motivation
@@ -18,6 +18,7 @@ The screenshot shows searching for `require` only in files with `md` extension (
 # Prefixes
 
 The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below prefixes are the builtin-defaults. Should you want to use this extension, please __carefully__ read the table below on how a prefix is added.  The configuration section shows how to add another prefix.
+
 ```lua
 -- DEFAULTS
 -- filter for file suffixes
@@ -25,6 +26,10 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below pre
 -- searches with ripgrep prompt $MY_PROMPT in files with extensions lua and md
 -- i.e. rg --glob="*.{lua,md}" -- $MY_PROMPT
 ["#"] = {
+    -- #$REMAINDER
+    -- # is caught prefix
+    -- `input` becomes $REMAINDER
+    -- in the above example #lua,md -> input: lua,md
     flag = "glob",
     cb = function(input)
         return string.format([[*.{%s}]], input)
@@ -50,7 +55,6 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below pre
         return string.format([[*{%s}*]], input)
     end,
 }
-```
 
 See also `Configuration`.
 
@@ -99,14 +103,14 @@ It will allow you to easily build custom functionality for shorthands to create 
 require("telescope").setup {
   extensions = {
     egrepify = {
-      -- intersect tokens in prompt ala "str1.*str2" that finds str1 and str2 
-      -- consecutively in line with wildcard in between
-      AND = true,                 -- default 
-      lnum = true,                -- default, not required
-      lnum_hl = "EgrepifyLnum",   -- default, not required, links to `Constant`
-      col = false,                -- default, not required
-      col_hl = "EgrepifyCol",     -- default, not required, links to `Constant`
-	  title_hl = "EgrepifyTitle"  -- default, not required, links to `Title`
+      -- intersect tokens in prompt ala "str1.*str2" that ONLY matches
+      -- if str1 and str2 are consecutively in line with anything in between (wildcard)
+      AND = true,                  -- default
+      lnum = true,                 -- default, not required
+      lnum_hl = "EgrepifyLnum",    -- default, not required, links to `Constant`
+      col = false,                 -- default, not required
+      col_hl = "EgrepifyCol",      -- default, not required, links to `Constant`
+      title_hl = "EgrepifyTitle",  -- default, not required, links to `Title`
       -- suffix = long line, see screenshot
       -- EXAMPLE ON HOW TO ADD PREFIX!
       prefixes = {
@@ -117,12 +121,11 @@ require("telescope").setup {
         ["!"] = {
           flag = "invert-match",
         },
-	},
       },
     },
   },
 }
-require "telescope".load_extension "egrepify"
+require("telescope").load_extension "egrepify"
 ```
 
 # DISCLAIMER
