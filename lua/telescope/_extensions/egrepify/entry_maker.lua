@@ -2,7 +2,7 @@ local entry_display = require("telescope.pickers.entry_display")
 local ts_utils = require("telescope.utils")
 local ext_utils = require("telescope._extensions.egrepify.utils")
 
-local suffix = string.format(" %s", ext_utils.repeat_char("─", 1000))
+local title_suffix = string.format(" %s", ext_utils.repeat_char("─", 1000))
 local str = require("plenary.strings")
 
 local function line_display(entry, data, opts)
@@ -15,37 +15,46 @@ local function line_display(entry, data, opts)
 		}),
 		""
 	)
-	return {
-		{
+	local out = {}
+	if opts.lnum or opts.col then
+		out[#out + 1] = {
 			lnum_col_str,
-			function()
-				local hl_table = {}
-				if opts.lnum then
-					hl_table[#hl_table + 1] = { { 0, 4 }, opts.lnum_hl }
-				end
-				if opts.col then
-					hl_table[#hl_table + 1] = { { 5, #lnum_col_str }, opts.col_hl }
-				end
-				return hl_table
-			end,
-		},
-		{
-			entry.ordinal,
-			function()
-				-- TODO: can we get proper selection highlighting?
-				-- local current_picker
-				-- local bufnr = vim.api.nvim_get_current_buf()
-				-- if vim.bo[bufnr].filetype == "TelescopePrompt" then
-				--   current_picker = action_state.get_current_picker(bufnr)
-				-- end
-				-- local text_hl = "GruvboxFg3"
-				-- if current_picker then
-				--   if current_picker:is_multi_selected(entry) then
-				--     text_hl = "TelescopeSelection"
-				--   end
-				-- end
-				local highlights = {}
-				local beginning = 0
+			{
+				lnum_col_str,
+				function()
+					local hl_table = {}
+					if opts.lnum then
+						hl_table[#hl_table + 1] = { { 0, 4 }, opts.lnum_hl }
+					end
+					if opts.col then
+						hl_table[#hl_table + 1] = { { 5, #lnum_col_str }, opts.col_hl }
+					end
+					if vim.tbl_isempty(hl_table) then
+						return { { 0, 1 }, "Normal" }
+					end
+					return hl_table
+				end,
+			},
+		}
+	end
+	out[#out + 1] = {
+		entry.ordinal,
+		function()
+			-- TODO: can we get proper selection highlighting?
+			-- local current_picker
+			-- local bufnr = vim.api.nvim_get_current_buf()
+			-- if vim.bo[bufnr].filetype == "TelescopePrompt" then
+			--   current_picker = action_state.get_current_picker(bufnr)
+			-- end
+			-- local text_hl = "GruvboxFg3"
+			-- if current_picker then
+			--   if current_picker:is_multi_selected(entry) then
+			--     text_hl = "TelescopeSelection"
+			--   end
+			-- end
+			local highlights = {}
+			local beginning = 0
+			if not vim.tbl_isempty(data["submatches"]) then
 				for _, submatch in ipairs(data["submatches"]) do
 					local s = submatch["start"]
 					local f = submatch["end"]
@@ -58,15 +67,17 @@ local function line_display(entry, data, opts)
 				if opts.text_hl then
 					highlights[#highlights + 1] = { { beginning, #entry.text }, opts.text_hl }
 				end
-				return highlights
-			end,
-		},
+			end
+			return highlights
+		end,
 	}
+	return out
 end
 
 local function title_display(filename, data, opts)
 	local display_filename = ts_utils.transform_path({ cwd = opts.cwd }, filename)
-	local display, hl_group = ts_utils.transform_devicons(display_filename, display_filename .. opts.suffix, false)
+	local suffix_ = opts.title_suffix or ""
+	local display, hl_group = ts_utils.transform_devicons(display_filename, display_filename .. suffix_, false)
 	if hl_group then
 		return display,
 			{
@@ -75,9 +86,9 @@ local function title_display(filename, data, opts)
 					{ 4, 4 + #display_filename },
 					opts.title_hl,
 				},
-				opts.suffix ~= "" and {
-					{ 4 + #display_filename, 4 + #display_filename + #opts.suffix },
-					opts.suffix_hl,
+				suffix_ ~= "" and {
+					{ 4 + #display_filename, 4 + #display_filename + #opts.title_suffix },
+					opts.title_suffix_hl,
 				} or nil,
 			}
 	else
@@ -87,9 +98,9 @@ end
 
 return function(opts)
 	opts = opts or {}
-	opts.suffix = vim.F.if_nil(opts.suffix, suffix)
 	opts.title_hl = vim.F.if_nil(opts.title_hl, "EgrepifyTitle")
-	opts.suffix_hl = vim.F.if_nil(opts.suffix_hl, "EgrepifySuffix")
+	opts.title_suffix = vim.F.if_nil(opts.title_suffix, title_suffix)
+	opts.title_suffix_hl = vim.F.if_nil(opts.title_suffix_hl, "EgrepifySuffix")
 	opts.lnum = vim.F.if_nil(opts.lnum, true)
 	opts.lnum_hl = vim.F.if_nil(opts.lnum_hl, "EgrepifyLnum")
 	opts.col = vim.F.if_nil(opts.col, false)
@@ -102,12 +113,15 @@ return function(opts)
 		lnum_col_width = lnum_col_width + 3
 	end
 
+	local items = {}
+	if opts.lnum or opts.col then
+		items[#items + 1] = { width = lnum_col_width }
+	end
+	items[#items + 1] = { remaining = true }
+
 	opts.display_line_create = vim.F.if_nil(opts.display_line_create, {
-		separator = " ",
-		items = {
-			(opts.lnum or opts.col) and { width = lnum_col_width } or nil,
-			{ remaining = true },
-		},
+		separator = (opts.lnum or opts.col) and " " or "",
+		items = items,
 	})
 	opts.title_display = vim.F.if_nil(opts.title_display, title_display)
 
@@ -122,10 +136,10 @@ return function(opts)
 				local data = json_line["data"]
 				local text = data["lines"]["text"]:gsub("\n", " ")
 				data.text = text
-				if text == " " then
-					return nil
-				end
-				local start = data["submatches"][1]["start"]
+				-- if text == " " then
+				-- 	return nil
+				-- end
+				local start = not vim.tbl_isempty(data["submatches"]) and data["submatches"][1]["start"] or 0
 				local line_displayer = entry_display.create(opts.display_line_create)
 				local entry = {
 					filename = data["path"]["text"],

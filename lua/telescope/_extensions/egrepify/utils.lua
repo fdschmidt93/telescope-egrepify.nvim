@@ -37,7 +37,11 @@ M.prefix_handler = function(prompt_tokens, prefix, prefix_opts)
 		if token_prefix == prefix then
 			local token_str = token:sub(prefix_width + 1, -1)
 			token_str = prefix_opts.cb and prefix_opts.cb(token_str) or token_str
-			args[#args + 1] = string.format([[--%s=%s]], prefix_opts.flag, token_str)
+			if not token_str or token_str == "" then
+				args[#args + 1] = string.format([[--%s]], prefix_opts.flag)
+			else
+				args[#args + 1] = string.format([[--%s=%s]], prefix_opts.flag, token_str)
+			end
 			indices[#indices + 1] = i
 		end
 	end
