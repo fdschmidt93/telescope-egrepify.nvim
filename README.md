@@ -88,7 +88,7 @@ require("telescope").setup {
 
 # DISCLAIMER
 
-Please consider forking or well-formed PRs instead to fix issues or add new features. This extension foremost serves my own needs and turned into a plugin as maybe other users may want to personalize `rg` via `telescope.nvim` in similar fashion.
+Please consider forking for your own customization or well-formed PRs instead to fix issues or add new features. This extension foremost serves my own needs and turned into a plugin as maybe other users may want to personalize `rg` via `telescope.nvim` in similar fashion. Frankly, I will not promise long-term maintenance beyond review (and hopefully merging) of PRs.
 
 # Naming
 
