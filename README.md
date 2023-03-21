@@ -52,7 +52,44 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below pre
 }
 ```
 
-See also `Configuration`
+See also `Configuration`.
+
+# Installation
+
+Here is one way to install this extension with [lazy.nvim](https://github.com/folke/lazy.nvim).
+
+```lua
+{
+    "fdschmidt93/telescope-egrepify.nvim",
+    dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" }
+}
+```
+
+Make sure to
+
+```lua
+local opts = { "$YOUR_TELESCOPE_OPTS" }
+require "telescope".setup()
+require "telescope".load_extension "egrepify"
+```
+
+to appropriately setup the plugin.
+
+
+## Usage
+
+You can call this extension with vimscript
+
+```vim
+:Telscope egrepify
+```
+
+or lua
+
+```lua
+require "telescope".extensions.egrepify.egrepify {}
+```
+
 
 # Configuration
 
@@ -85,11 +122,12 @@ require("telescope").setup {
     },
   },
 }
+require "telescope".load_extension "egrepify"
 ```
 
 # DISCLAIMER
 
-Please consider forking for your own customization or well-formed PRs instead to fix issues or add new features. This extension foremost serves my own needs and turned into a plugin as maybe other users may want to personalize `rg` via `telescope.nvim` in similar fashion. Frankly, I will not promise long-term maintenance beyond review (and hopefully merging) of PRs.
+Please consider forking for your own customization or well-formed PRs instead to fix issues or add new features. This extension foremost serves my own needs and turned into a plugin as maybe other users may want to personalize `rg` via `telescope.nvim` in similar fashion. While many options _are_ configurable, frankly, I will not promise long-term maintenance beyond review (and hopefully merging) of PRs.
 
 # Naming
 
