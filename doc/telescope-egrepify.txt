@@ -1,0 +1,134 @@
+==============================================================================
+Introduction                                           *telescope-egrepify.nvim*
+
+
+telescope-egrepify.nvim is a telescope.nvim extension to
+customize live grep with "prefixes" to enhance `rg` flags.
+ Features:
+   1. Add custom prefixes to `rg` flags
+   2. Custom entry maker for clear & customizable view on results
+   3. Better defaults (AND operator for tokens, prefixes, entry maker)
+
+ Prefix examples - search for sorter in:
+   1. `#md,lua sorter` in markdown & lua (file extension globbing)
+   2. `>lua sorter` in paths that contain lua in directory names
+   3. `&picker sorter` in files for which `picker` is in the file name
+
+
+                                              *telescope-egrepify.prefix Prefix*
+The core functionality of `telescope-egripfy.nvim` are `prefixes`.
+The below prefixes are the builtin-defaults. Should you want to use
+extension, please __carefully__ read the table below on how a prefix
+is added.  The configuration section shows how to add another prefix.
+>lua
+  -- DEFAULTS
+  -- filter for file suffixes
+  -- example prompt: #lua,md $MY_PROMPT
+  -- searches with ripgrep prompt $MY_PROMPT in files with extensions lua and md
+  -- i.e. rg --glob="*.{lua,md}" -- $MY_PROMPT
+  { ["#"] = {
+        -- #$REMAINDER
+        -- # is caught prefix
+        -- `input` becomes $REMAINDER
+        -- in the above example #lua,md -> input: lua,md
+        flag = "glob",
+        cb = function(input)
+            return string.format([[*.{%s}]], input)
+        end,
+    },
+    -- filter for (partial) folder names
+    -- example prompt: >conf $MY_PROMPT
+    -- searches with ripgrep prompt $MY_PROMPT in paths that have "conf" in folder
+    -- i.e. rg --glob="**/conf*/**" -- $MY_PROMPT
+    [">"] = {
+        flag = "glob",
+        cb = function(input)
+            return string.format([[**/{%s}*/**]], input)
+        end,
+    },
+    -- filter for (partial) folder names
+    -- example prompt: &egrep $MY_PROMPT
+    -- searches with ripgrep prompt $MY_PROMPT in paths that have "egrep" in file name
+    -- i.e. rg --glob="*egrep*" -- $MY_PROMPT
+    ["&"] = {
+        flag = "glob",
+        cb = function(input)
+            return string.format([[*{%s}*]], input)
+        end,
+    }
+  }
+<
+ 
+If you want to opt-out of a prefix you can set `prefix` or pass `prefix` to `opts`
+with the corresponding prefix character set to `false`:
+>lua
+  -- opting out of file extension
+  { ["#"] = false }
+<
+
+If you want to add a prefix, you can do so by adding a table to the `prefixes` table
+in the `setup` function. The table should have the following structure:
+>lua
+  {
+    -- prefix character
+    ["<prefix>"] = {
+      -- flag to be passed to `rg`
+      flag = "<flag>",
+      -- optional callback to be called with the remainder of parsed input
+      -- should return a string that is passed to `rg` as the flag values
+      -- If not provided, remainder, *if existing*, is passed as is
+      cb = function(input)
+        return "<flag_value>"
+      end,
+    },
+    -- example of a boolean flag
+     ["!"] = {
+       flag = "invert-match",
+     },
+  }
+ The default prefixes in the beginning of the section are good examples on how
+ to add a prefix.
+<
+
+==============================================================================
+Picker                                               *telescope-egrepify.picker*
+
+You can access the picker with defaults and user-configuration by calling
+>lua
+  require("telescope").extensions.egrepify.picker()
+<
+ or via vimscript
+>vim
+  :Telescope egrepify
+<
+ The available configuration options are listed at |telescope-egrepify.picker.PickerConfig|.
+
+PickerConfig                                                      *PickerConfig*
+
+    Fields: ~
+        {cwd}                (string)   directory to run `rg` input
+        {vimgrep_arguments}  (table)    args for `rg`, see |telescope.defaults.vimgrep_arguments|
+        {AND}                (boolean)  search with fzf-like AND logic to ordered sub-tokens of prompt
+        {prefixes}           (table)    prefixes for `rg` input, see |telescope-egrepify.prefix|
+        {title_hl}           (string)   hl for title (default: `EgrepifyTitle` w/ link to `Title`)
+        {title_suffix}       (string)   string after filename title (default: " " .. "──────────")
+        {title_suffix_hl}    (string)   title suffix hl [`EgrepifySuffix`, links to `Comment`]
+        {lnum}               (boolean)  include lnum in result entry
+        {lnum_hl}            (string)   lnum hl [`EgrepifyLnum`, links to `Constant`]
+        {col}                (boolean)  include col in result entry
+        {col_hl}             (string)   col hl (default: `EgrepifyCol`, links to `Constant`)
+
+
+Picker.picker({opts})                                            *Picker.picker*
+    telescope-egrepify picker
+
+    Parameters: ~
+        {opts}  (PickerConfig)  see |telescope-egrepify.picker.PickerConfig|
+
+    Usage: ~
+>lua
+        require("telescope").extensions.egrepify.picker()
+<
+
+
+vim:tw=78:ts=8:noet:ft=help:norl:
