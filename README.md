@@ -17,7 +17,12 @@ The screenshot shows searching for `require` only in files with `md` extension (
 
 # Prefixes
 
-The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below prefixes are the builtin-defaults. Should you want to use this extension, please __carefully__ read the table below on how a prefix is added.  The configuration section shows how to add another prefix.
+The core functionality of `telescope-egripfy.nvim` are `prefixes`. What you need to know at a glance:
+
+- Prefixes seamlessly expand user-specific `ripgrep` flags on-the-fly
+- The below prefixes are the builtin-defaults with examples on how they are used
+- During search, you can toggle the use of prefixs by hitting <C-z> (z) in insert (normal) mode
+- The configuration section shows how to opt out of a default and add another prefix.
 
 ```lua
 -- DEFAULTS
@@ -57,12 +62,6 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. The below pre
   }
 }
 ```
-If you want to opt-out of a prefix you can set `prefix` or pass `prefix` to `opts` with the corresponding prefix character set to `false`:
-
-```lua
--- opting out of file extension
-{ ["#"] = false }
-```
 
 See also `Configuration`.
 
@@ -80,12 +79,11 @@ Here is one way to install this extension with [lazy.nvim](https://github.com/fo
 Make sure to
 
 ```lua
-local opts = { "$YOUR_TELESCOPE_OPTS" }
-require "telescope".setup()
+require "telescope".setup({ "$YOUR_TELESCOPE_OPTS" })
 require "telescope".load_extension "egrepify"
 ```
 
-to appropriately setup the plugin.
+to appropriately setup the plugin. See [Configuration](#Configuration) for options to configure the extension.
 
 
 ## Usage
@@ -105,7 +103,7 @@ require "telescope".extensions.egrepify.egrepify {}
 
 # Configuration
 
-It will allow you to easily build custom functionality for shorthands to create `ripgrep` flags on-the-fly seamlessly.
+The below configuration reflects defaults and examples on how to customize `telescope-egripfy.nvim` to your liking.
 
 ```lua
 require("telescope").setup {
@@ -129,12 +127,30 @@ require("telescope").setup {
         ["!"] = {
           flag = "invert-match",
         },
+        -- HOW TO OPT OUT OF PREFIX
+        -- ^ is not a default prefix and safe example
+        ["^"] = false
+      },
+      mappings = {
+        i = {
+          ["<C-z>"] = ext_actions.toggle_prefixes,
+        },
+        n = {
+          ["z"] = ext_actions.toggle_prefixes,
+        },
       },
     },
   },
 }
 require("telescope").load_extension "egrepify"
 ```
+
+# Mappings
+
+
+| Insert / Normal | egrepify_actions           | Description                                                                      |
+| --------------- | -------------------- | -------------------------------------------------------------------------------- |
+| `<C-z>/z`       | toggle_prefixes               | Toggle using prefixes on and off (default: on)    |
 
 # DISCLAIMER
 

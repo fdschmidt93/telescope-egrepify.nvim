@@ -1,9 +1,18 @@
+local ext_actions = require "telescope._extensions.egrepify.actions"
+
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local config = {}
 
 _TelescopeEgrepifyConfig = {
-  mappings = {},
+  mappings = {
+    i = {
+      ["<C-z>"] = ext_actions.toggle_prefixes,
+    },
+    n = {
+      ["z"] = ext_actions.toggle_prefixes,
+    },
+  },
   prefixes = {
     -- filter for file suffixes
     ["#"] = {
