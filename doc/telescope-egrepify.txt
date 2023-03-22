@@ -19,7 +19,7 @@ customize live grep with "prefixes" to enhance `rg` flags.
 The core functionality of `telescope-egripfy.nvim` are `prefixes`.
 The below prefixes are the builtin-defaults. Should you want to use
 extension, please __carefully__ read the table below on how a prefix
-is added.  The configuration section shows how to add another prefix.
+is added. The configuration section shows how to add another prefix.
 >lua
   -- DEFAULTS
   -- filter for file suffixes
@@ -58,9 +58,9 @@ is added.  The configuration section shows how to add another prefix.
     }
   }
 <
- 
-If you want to opt-out of a prefix you can set `prefix` or pass `prefix` to `opts`
-with the corresponding prefix character set to `false`:
+You can untoggle the use of prefixs by hitting <C-z> (z) in insert (normal) mode.
+If you want to opt-out of a single prefix you can set `prefix` or pass `prefix`
+to `opts` with the corresponding prefix character set to `false`:
 >lua
   -- opting out of file extension
   { ["#"] = false }
@@ -108,6 +108,7 @@ PickerConfig                                                      *PickerConfig*
     Fields: ~
         {cwd}                (string)   directory to run `rg` input
         {vimgrep_arguments}  (table)    args for `rg`, see |telescope.defaults.vimgrep_arguments|
+        {use_prefixes}       (boolean)  use prefixes in prompt, toggleable with <C-z> (default: true)
         {AND}                (boolean)  search with fzf-like AND logic to ordered sub-tokens of prompt
         {prefixes}           (table)    prefixes for `rg` input, see |telescope-egrepify.prefix|
         {title_hl}           (string)   hl for title (default: `EgrepifyTitle` w/ link to `Title`)
