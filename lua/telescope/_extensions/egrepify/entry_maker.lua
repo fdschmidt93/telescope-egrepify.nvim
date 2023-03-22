@@ -1,8 +1,7 @@
 local entry_display = require "telescope.pickers.entry_display"
 local ts_utils = require "telescope.utils"
-local ext_utils = require "telescope._extensions.egrepify.utils"
+local ext_conf = require("telescope._extensions.egrepify.config").values
 
-local title_suffix = string.format(" %s", ext_utils.repeat_char("─", 1000))
 local str = require "plenary.strings"
 
 local function line_display(entry, data, opts)
@@ -95,13 +94,13 @@ end
 
 return function(opts)
   opts = opts or {}
-  opts.title_hl = vim.F.if_nil(opts.title_hl, "EgrepifyTitle")
+  opts.title_hl = vim.F.if_nil(opts.title_hl, ext_conf.title_hl)
   opts.title_suffix = vim.F.if_nil(opts.title_suffix, title_suffix)
-  opts.title_suffix_hl = vim.F.if_nil(opts.title_suffix_hl, "EgrepifySuffix")
-  opts.lnum = vim.F.if_nil(opts.lnum, true)
-  opts.lnum_hl = vim.F.if_nil(opts.lnum_hl, "EgrepifyLnum")
-  opts.col = vim.F.if_nil(opts.col, false)
-  opts.col_hl = vim.F.if_nil(opts.col_hl, "EgrepifyCol")
+  opts.title_suffix_hl = vim.F.if_nil(opts.title_suffix_hl, ext_conf.title_suffix_hl)
+  opts.lnum = vim.F.if_nil(opts.lnum, ext_conf.lnum)
+  opts.lnum_hl = vim.F.if_nil(opts.lnum_hl, ext_conf.lnum_hl)
+  opts.col = vim.F.if_nil(opts.col, ext_conf.col)
+  opts.col_hl = vim.F.if_nil(opts.col_hl, ext_conf.col_hl)
   local lnum_col_width = 1
   if opts.lnum then
     lnum_col_width = lnum_col_width + 4

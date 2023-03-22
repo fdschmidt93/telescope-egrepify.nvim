@@ -1,10 +1,21 @@
 local ext_actions = require "telescope._extensions.egrepify.actions"
+local ext_utils = require "telescope._extensions.egrepify.utils"
 
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local config = {}
 
+local title_suffix = string.format(" %s", ext_utils.repeat_char("─", 1000))
+
 _TelescopeEgrepifyConfig = {
+  AND = true,
+  lnum = true,
+  lnum_hl = "EgrepifyLnum",
+  col = false,
+  col_hl = "EgrepifyCol",
+  use_prefixes = true,
+  title_suffix = title_suffix,
+  title_suffix_hl = "EgrepifySuffix",
   mappings = {
     i = {
       ["<C-z>"] = ext_actions.toggle_prefixes,

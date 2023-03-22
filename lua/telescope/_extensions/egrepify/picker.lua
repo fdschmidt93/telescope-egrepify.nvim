@@ -5,6 +5,7 @@ local finders = require "telescope.finders"
 local pickers = require "telescope.pickers"
 local sorters = require "telescope.sorters"
 local conf = require("telescope.config").values
+local ext_conf = require("telescope._extensions.egrepify.config").values
 
 local flatten = vim.tbl_flatten
 
@@ -44,8 +45,8 @@ function Picker.picker(opts)
   opts = opts or {}
 
   -- matches everything in between sub-tokens of prompt akin to fzf
-  opts.AND = vim.F.if_nil(opts.AND, _TelescopeEgrepifyConfig.AND)
-  opts.prefixes = vim.F.if_nil(opts.prefixes, _TelescopeEgrepifyConfig.prefixes)
+  opts.AND = vim.F.if_nil(opts.AND, ext_conf.AND)
+  opts.prefixes = vim.F.if_nil(opts.prefixes, ext_conf.prefixes)
 
   -- opting out of prefixes
   for k, v in pairs(opts.prefixes) do
@@ -92,7 +93,7 @@ function Picker.picker(opts)
     previewer = conf.grep_previewer(opts),
     sorter = sorters.empty(),
   })
-  picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, true)
+  picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, ext_conf.use_prefixes)
 
   picker:find()
 end
