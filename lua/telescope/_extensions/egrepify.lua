@@ -20,7 +20,7 @@
 ---The core functionality of `telescope-egripfy.nvim` are `prefixes`.
 ---The below prefixes are the builtin-defaults. Should you want to use
 ---extension, please __carefully__ read the table below on how a prefix
----is added.  The configuration section shows how to add another prefix.
+---is added. The configuration section shows how to add another prefix.
 --->lua
 ---  -- DEFAULTS
 ---  -- filter for file suffixes
@@ -59,9 +59,9 @@
 ---    }
 ---  }
 ---<
---- 
----If you want to opt-out of a prefix you can set `prefix` or pass `prefix` to `opts`
----with the corresponding prefix character set to `false`:
+---You can untoggle the use of prefixs by hitting <C-z> (z) in insert (normal) mode.
+---If you want to opt-out of a single prefix you can set `prefix` or pass `prefix`
+---to `opts` with the corresponding prefix character set to `false`:
 --->lua
 ---  -- opting out of file extension
 ---  { ["#"] = false }

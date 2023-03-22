@@ -1,3 +1,4 @@
+local action_state = require "telescope.actions.state"
 local ext_entry_maker = require "telescope._extensions.egrepify.entry_maker"
 local ext_utils = require "telescope._extensions.egrepify.utils"
 local finders = require "telescope.finders"
@@ -23,6 +24,7 @@ local flatten = vim.tbl_flatten
 ---@class PickerConfig
 ---@field cwd string directory to run `rg` input
 ---@field vimgrep_arguments table args for `rg`, see |telescope.defaults.vimgrep_arguments|
+---@field use_prefixes boolean use prefixes in prompt, toggleable with <C-z> (default: true)
 ---@field AND boolean search with fzf-like AND logic to ordered sub-tokens of prompt
 ---@field prefixes table prefixes for `rg` input, see |telescope-egrepify.prefix|
 ---@field title_hl string hl for title (default: `EgrepifyTitle` w/ link to `Title`)
@@ -63,10 +65,17 @@ function Picker.picker(opts)
 
     local tokens = ext_utils.tokenize(prompt)
     local prompt_args = {}
-    for prefix, prefix_opts in pairs(opts.prefixes) do
-      local prefix_args
-      tokens, prefix_args = ext_utils.prefix_handler(tokens, prefix, prefix_opts)
-      prompt_args[#prompt_args + 1] = prefix_args
+    local current_picker
+    local bufnr = vim.api.nvim_get_current_buf()
+    if vim.bo[bufnr].filetype == "TelescopePrompt" then
+      current_picker = action_state.get_current_picker(bufnr)
+    end
+    if current_picker and current_picker.use_prefixes == true then
+      for prefix, prefix_opts in pairs(opts.prefixes) do
+        local prefix_args
+        tokens, prefix_args = ext_utils.prefix_handler(tokens, prefix, prefix_opts)
+        prompt_args[#prompt_args + 1] = prefix_args
+      end
     end
     prompt = vim.trim(table.concat(tokens, " "))
     -- matches everything in between sub-tokens of prompt
@@ -76,17 +85,17 @@ function Picker.picker(opts)
     return flatten { args, prompt_args, "--", prompt }
   end, ext_entry_maker(opts), opts.max_results, opts.cwd)
 
-  pickers
-      .new(opts, {
-        prompt_title = "Live Grep",
-        finder = live_grepper,
-        default_selection_index = 2,
-        previewer = conf.grep_previewer(opts),
-        sorter = sorters.empty(),
-      })
-      :find()
-end
+  local picker = pickers.new(opts, {
+    prompt_title = "Live Grep",
+    finder = live_grepper,
+    default_selection_index = 2,
+    previewer = conf.grep_previewer(opts),
+    sorter = sorters.empty(),
+  })
+  picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, true)
 
+  picker:find()
+end
 
 ---@export Picker
 return Picker.picker
