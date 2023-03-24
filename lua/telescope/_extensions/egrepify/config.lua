@@ -60,7 +60,7 @@ _TelescopeEgrepifyConfig = {
       actions[key]:enhance {
         post = function()
           local entry = action_state.get_selected_entry()
-          if entry and entry.lnum == nil then
+          if entry and entry.kind == "begin" then
             actions[key](prompt_bufnr)
           end
         end,
@@ -75,7 +75,7 @@ _TelescopeEgrepifyConfig = {
         local original_linked_states = entry_manager.linked_states
         local list_excl_titles = require("telescope.algos.linked_list"):new { track_at = entry_manager.max_results }
         for val in entry_manager.linked_states:iter() do
-          if val[1].lnum ~= nil then
+          if val[1].kind == "begin" then
             list_excl_titles:append(val)
           end
         end

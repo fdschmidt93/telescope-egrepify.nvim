@@ -144,6 +144,7 @@ return function(opts)
           col = start + 1,
           value = data,
           ordinal = text,
+          kind = kind,
         }
 
         local display = function()
@@ -160,6 +161,7 @@ return function(opts)
         return {
           value = filename,
           ordinal = filename,
+          kind = kind,
           display = function()
             return opts.title_display(filename, data, opts)
           end,
