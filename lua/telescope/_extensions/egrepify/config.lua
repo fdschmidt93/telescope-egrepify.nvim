@@ -50,24 +50,22 @@ _TelescopeEgrepifyConfig = {
   },
   attach_mappings = function(prompt_bufnr, map)
     map("i", "<c-space>", actions.to_fuzzy_refine)
-    actions.move_selection_previous:enhance {
-      -- ensure "title" lines are not selected
-      post = function()
-        local entry = action_state.get_selected_entry()
-        if entry and entry.lnum == nil then
-          actions.move_selection_previous(prompt_bufnr)
-        end
-      end,
-    }
-    actions.move_selection_next:enhance {
-      -- ensure "title" lines are not selected
-      post = function()
-        local entry = action_state.get_selected_entry()
-        if entry and entry.lnum == nil then
-          actions.move_selection_next(prompt_bufnr)
-        end
-      end,
-    }
+    -- ensure "title" lines are not selected when iterating selections
+    for _, key in ipairs {
+      "move_selection_next",
+      "move_selection_previous",
+      "move_selection_better",
+      "move_selection_worse",
+    } do
+      actions[key]:enhance {
+        post = function()
+          local entry = action_state.get_selected_entry()
+          if entry and entry.lnum == nil then
+            actions[key](prompt_bufnr)
+          end
+        end,
+      }
+    end
     actions.send_to_qflist:enhance {
       -- ensure "title" lines are not sent to qflist
       pre = function()
