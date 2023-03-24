@@ -24,6 +24,7 @@ local flatten = vim.tbl_flatten
 
 ---@class PickerConfig
 ---@field cwd string directory to run `rg` input
+---@field grep_open_files boolean search only open files (default: false)
 ---@field vimgrep_arguments table args for `rg`, see |telescope.defaults.vimgrep_arguments|
 ---@field use_prefixes boolean use prefixes in prompt, toggleable with <C-z> (default: true)
 ---@field AND boolean search with fzf-like AND logic to ordered sub-tokens of prompt
@@ -57,6 +58,9 @@ function Picker.picker(opts)
 
   local vimgrep_arguments = opts.vimgrep_arguments or conf.vimgrep_arguments
   opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
+  local open_files = vim.F.if_nil(opts.grep_open_files, ext_conf.grep_open_files)
+      and ext_utils._get_open_files(opts.cwd)
+    or {}
   local args = flatten { vimgrep_arguments, { "--json" } }
 
   local live_grepper = finders.new_job(function(prompt)
@@ -83,7 +87,7 @@ function Picker.picker(opts)
     if opts.AND then
       prompt = prompt:gsub("%s", ".*")
     end
-    return flatten { args, prompt_args, "--", prompt }
+    return flatten { args, prompt_args, "--", prompt, open_files }
   end, ext_entry_maker(opts), opts.max_results, opts.cwd)
 
   local picker = pickers.new(opts, {
