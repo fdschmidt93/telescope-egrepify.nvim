@@ -68,19 +68,27 @@ _TelescopeEgrepifyConfig = {
       end,
     }
     actions.send_to_qflist:enhance {
-      -- TODO: affects `Telescope resume`
       -- ensure "title" lines are not sent to qflist
       pre = function()
         local current_picker = action_state.get_current_picker(prompt_bufnr)
         local entry_manager = current_picker.manager
         -- creating new LinkedList without "title" lines
-        local LinkedList = require("telescope.algos.linked_list"):new { track_at = entry_manager.max_results }
+        local original_linked_states = entry_manager.linked_states
+        local list_excl_titles = require("telescope.algos.linked_list"):new { track_at = entry_manager.max_results }
         for val in entry_manager.linked_states:iter() do
           if val[1].lnum ~= nil then
-            LinkedList:append(val)
+            list_excl_titles:append(val)
           end
         end
-        entry_manager.linked_states = LinkedList
+        entry_manager.linked_states = list_excl_titles
+        -- restore original linked_states after qflist entries are created
+        -- see telescope.actions.send_to_qflist
+        -- pre is triggered right before caching picker for resumption
+        actions.close:enhance {
+          pre = function()
+            entry_manager.linked_states = original_linked_states
+          end,
+        }
       end,
     }
     return true
