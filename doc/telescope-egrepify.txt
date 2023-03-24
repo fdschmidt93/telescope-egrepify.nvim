@@ -107,6 +107,7 @@ PickerConfig                                                      *PickerConfig*
 
     Fields: ~
         {cwd}                (string)   directory to run `rg` input
+        {grep_open_files}    (boolean)  search only open files (default: false)
         {vimgrep_arguments}  (table)    args for `rg`, see |telescope.defaults.vimgrep_arguments|
         {use_prefixes}       (boolean)  use prefixes in prompt, toggleable with <C-z> (default: true)
         {AND}                (boolean)  search with fzf-like AND logic to ordered sub-tokens of prompt

@@ -69,4 +69,24 @@ M.notify = function(funname, opts)
   end
 end
 
+-- Get the list of open buffers, relative to cwd if provided
+M._get_open_files = function(cwd)
+  local cwd_len = (cwd ~= nil) and #vim.fs.normalize(cwd) or 0
+  local buffers = vim.api.nvim_list_bufs()
+  local open_buffers = {}
+  for _, bufnr in ipairs(buffers) do
+    if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].buflisted then
+      local buf_name = vim.fs.normalize(vim.api.nvim_buf_get_name(bufnr))
+      -- exclude empty buffers
+      if buf_name ~= "" then
+        if cwd then
+          buf_name = buf_name:sub(cwd_len + 2, -1)
+        end
+        open_buffers[#open_buffers + 1] = buf_name
+      end
+    end
+  end
+  return open_buffers
+end
+
 return M
