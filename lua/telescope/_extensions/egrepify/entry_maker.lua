@@ -95,7 +95,7 @@ end
 return function(opts)
   opts = opts or {}
   opts.title_hl = vim.F.if_nil(opts.title_hl, ext_conf.title_hl)
-  opts.title_suffix = vim.F.if_nil(opts.title_suffix, title_suffix)
+  opts.title_suffix = vim.F.if_nil(opts.title_suffix, ext_conf.title_suffix)
   opts.title_suffix_hl = vim.F.if_nil(opts.title_suffix_hl, ext_conf.title_suffix_hl)
   opts.lnum = vim.F.if_nil(opts.lnum, ext_conf.lnum)
   opts.lnum_hl = vim.F.if_nil(opts.lnum_hl, ext_conf.lnum_hl)
