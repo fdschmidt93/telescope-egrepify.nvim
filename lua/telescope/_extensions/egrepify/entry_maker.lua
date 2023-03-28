@@ -1,6 +1,6 @@
 local entry_display = require "telescope.pickers.entry_display"
 local ts_utils = require "telescope.utils"
-local ext_conf = require("telescope._extensions.egrepify.config").values
+local egrep_conf = require("telescope._extensions.egrepify.config").values
 
 local str = require "plenary.strings"
 
@@ -42,10 +42,10 @@ local function line_display(entry, data, opts)
       -- if vim.bo[bufnr].filetype == "TelescopePrompt" then
       --   current_picker = action_state.get_current_picker(bufnr)
       -- end
-      -- local text_hl = "GruvboxFg3"
+      -- local tegrep_hl = "GruvboxFg3"
       -- if current_picker then
       --   if current_picker:is_multi_selected(entry) then
-      --     text_hl = "TelescopeSelection"
+      --     tegrep_hl = "TelescopeSelection"
       --   end
       -- end
       local highlights = {}
@@ -54,14 +54,14 @@ local function line_display(entry, data, opts)
         for _, submatch in ipairs(data["submatches"]) do
           local s = submatch["start"]
           local f = submatch["end"]
-          if opts.text_hl then
-            highlights[#highlights + 1] = { { beginning, s }, opts.text_hl }
+          if opts.tegrep_hl then
+            highlights[#highlights + 1] = { { beginning, s }, opts.tegrep_hl }
           end
           highlights[#highlights + 1] = { { s, f }, "TelescopeMatching" }
           beginning = f
         end
-        if opts.text_hl then
-          highlights[#highlights + 1] = { { beginning, #entry.text }, opts.text_hl }
+        if opts.tegrep_hl then
+          highlights[#highlights + 1] = { { beginning, #entry.text }, opts.tegrep_hl }
         end
       end
       return highlights
@@ -94,13 +94,13 @@ end
 
 return function(opts)
   opts = opts or {}
-  opts.title_hl = vim.F.if_nil(opts.title_hl, ext_conf.title_hl)
-  opts.title_suffix = vim.F.if_nil(opts.title_suffix, ext_conf.title_suffix)
-  opts.title_suffix_hl = vim.F.if_nil(opts.title_suffix_hl, ext_conf.title_suffix_hl)
-  opts.lnum = vim.F.if_nil(opts.lnum, ext_conf.lnum)
-  opts.lnum_hl = vim.F.if_nil(opts.lnum_hl, ext_conf.lnum_hl)
-  opts.col = vim.F.if_nil(opts.col, ext_conf.col)
-  opts.col_hl = vim.F.if_nil(opts.col_hl, ext_conf.col_hl)
+  opts.title_hl = vim.F.if_nil(opts.title_hl, egrep_conf.title_hl)
+  opts.title_suffix = vim.F.if_nil(opts.title_suffix, egrep_conf.title_suffix)
+  opts.title_suffix_hl = vim.F.if_nil(opts.title_suffix_hl, egrep_conf.title_suffix_hl)
+  opts.lnum = vim.F.if_nil(opts.lnum, egrep_conf.lnum)
+  opts.lnum_hl = vim.F.if_nil(opts.lnum_hl, egrep_conf.lnum_hl)
+  opts.col = vim.F.if_nil(opts.col, egrep_conf.col)
+  opts.col_hl = vim.F.if_nil(opts.col_hl, egrep_conf.col_hl)
   local lnum_col_width = 1
   if opts.lnum then
     lnum_col_width = lnum_col_width + 4
