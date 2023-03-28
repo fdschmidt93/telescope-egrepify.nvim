@@ -20,6 +20,7 @@ _TelescopeEgrepifyConfig = {
   mappings = {
     i = {
       ["<C-z>"] = ext_actions.toggle_prefixes,
+      ["<C-a>"] = ext_actions.toggle_and,
     },
     n = {
       ["z"] = ext_actions.toggle_prefixes,

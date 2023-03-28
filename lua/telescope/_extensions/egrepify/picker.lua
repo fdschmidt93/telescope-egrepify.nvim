@@ -45,9 +45,6 @@ local Picker = {}
 function Picker.picker(opts)
   opts = opts or {}
 
-  -- matches everything in between sub-tokens of prompt akin to fzf
-  opts.AND = vim.F.if_nil(opts.AND, ext_conf.AND)
-  opts.prefixes = vim.F.if_nil(opts.prefixes, ext_conf.prefixes)
 
   -- opting out of prefixes
   for k, v in pairs(opts.prefixes) do
@@ -84,7 +81,7 @@ function Picker.picker(opts)
     end
     prompt = vim.trim(table.concat(tokens, " "))
     -- matches everything in between sub-tokens of prompt
-    if opts.AND then
+    if current_picker.AND then
       prompt = prompt:gsub("%s", ".*")
     end
     return flatten { args, prompt_args, "--", prompt, open_files }
@@ -98,6 +95,8 @@ function Picker.picker(opts)
     sorter = sorters.empty(),
   })
   picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, ext_conf.use_prefixes)
+  -- matches everything in between sub-tokens of prompt akin to fzf
+  picker.AND = vim.F.if_nil(opts.AND, ext_conf.AND)
 
   picker:find()
 end
