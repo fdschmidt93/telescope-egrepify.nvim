@@ -97,8 +97,8 @@ if not has_telescope then
   error "This extension requires telescope.nvim (https://github.com/nvim-telescope/telescope.nvim)"
 end
 
-local ext_config = require "telescope._extensions.egrepify.config"
-local ext_picker = require "telescope._extensions.egrepify.picker"
+local egrep_config = require "telescope._extensions.egrepify.config"
+local egrep_picker = require "telescope._extensions.egrepify.picker"
 
 -- Initialize highlights
 vim.api.nvim_set_hl(0, "EgrepifyTitle", { link = "Title" })
@@ -109,18 +109,18 @@ vim.api.nvim_set_hl(0, "EgrepifyCol", { link = "Constant" })
 local egrepify = function(opts)
   opts = opts or {}
   local defaults = (function()
-    if ext_config.values.theme then
-      return require("telescope.themes")["get_" .. ext_config.values.theme](ext_config.values)
+    if egrep_config.values.theme then
+      return require("telescope.themes")["get_" .. egrep_config.values.theme](egrep_config.values)
     end
-    return vim.deepcopy(ext_config.values)
+    return vim.deepcopy(egrep_config.values)
   end)()
 
-  if ext_config.values.mappings then
+  if egrep_config.values.mappings then
     defaults.attach_mappings = function(prompt_bufnr, map)
-      if ext_config.values.attach_mappings then
-        ext_config.values.attach_mappings(prompt_bufnr, map)
+      if egrep_config.values.attach_mappings then
+        egrep_config.values.attach_mappings(prompt_bufnr, map)
       end
-      for mode, tbl in pairs(ext_config.values.mappings) do
+      for mode, tbl in pairs(egrep_config.values.mappings) do
         for key, action in pairs(tbl) do
           map(mode, key, action)
         end
@@ -145,12 +145,12 @@ local egrepify = function(opts)
     end
   end
 
-  ext_picker(popts)
+  egrep_picker(popts)
 end
 
 -- this pattern is required for lemmy-help
 local M = telescope.register_extension {
-  setup = ext_config.setup,
+  setup = egrep_config.setup,
   exports = {
     egrepify = egrepify,
   },

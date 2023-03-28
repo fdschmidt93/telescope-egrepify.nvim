@@ -1,11 +1,11 @@
 local action_state = require "telescope.actions.state"
-local ext_entry_maker = require "telescope._extensions.egrepify.entry_maker"
-local ext_utils = require "telescope._extensions.egrepify.utils"
+local egrep_entry_maker = require "telescope._extensions.egrepify.entry_maker"
+local egrep_utils = require "telescope._extensions.egrepify.utils"
 local finders = require "telescope.finders"
 local pickers = require "telescope.pickers"
 local sorters = require "telescope.sorters"
 local conf = require("telescope.config").values
-local ext_conf = require("telescope._extensions.egrepify.config").values
+local egrep_conf = require("telescope._extensions.egrepify.config").values
 
 local flatten = vim.tbl_flatten
 
@@ -55,8 +55,8 @@ function Picker.picker(opts)
 
   local vimgrep_arguments = opts.vimgrep_arguments or conf.vimgrep_arguments
   opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
-  local open_files = vim.F.if_nil(opts.grep_open_files, ext_conf.grep_open_files)
-      and ext_utils._get_open_files(opts.cwd)
+  local open_files = vim.F.if_nil(opts.grep_open_files, egrep_conf.grep_open_files)
+      and egrep_utils._get_open_files(opts.cwd)
     or {}
   local args = flatten { vimgrep_arguments, { "--json" } }
 
@@ -65,7 +65,7 @@ function Picker.picker(opts)
       return nil
     end
 
-    local tokens = ext_utils.tokenize(prompt)
+    local tokens = egrep_utils.tokenize(prompt)
     local prompt_args = {}
     local current_picker
     local bufnr = vim.api.nvim_get_current_buf()
@@ -75,7 +75,7 @@ function Picker.picker(opts)
     if current_picker and current_picker.use_prefixes == true then
       for prefix, prefix_opts in pairs(opts.prefixes) do
         local prefix_args
-        tokens, prefix_args = ext_utils.prefix_handler(tokens, prefix, prefix_opts)
+        tokens, prefix_args = egrep_utils.prefix_handler(tokens, prefix, prefix_opts)
         prompt_args[#prompt_args + 1] = prefix_args
       end
     end
@@ -85,7 +85,7 @@ function Picker.picker(opts)
       prompt = prompt:gsub("%s", ".*")
     end
     return flatten { args, prompt_args, "--", prompt, open_files }
-  end, ext_entry_maker(opts), opts.max_results, opts.cwd)
+  end, egrep_entry_maker(opts), opts.max_results, opts.cwd)
 
   local picker = pickers.new(opts, {
     prompt_title = "Live Grep",
@@ -94,9 +94,9 @@ function Picker.picker(opts)
     previewer = conf.grep_previewer(opts),
     sorter = sorters.empty(),
   })
-  picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, ext_conf.use_prefixes)
+  picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, egrep_conf.use_prefixes)
   -- matches everything in between sub-tokens of prompt akin to fzf
-  picker.AND = vim.F.if_nil(opts.AND, ext_conf.AND)
+  picker.AND = vim.F.if_nil(opts.AND, egrep_conf.AND)
 
   picker:find()
 end

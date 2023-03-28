@@ -56,8 +56,8 @@ end
 ---@param opts table: opts.level string, opts.msg string
 M.notify = function(funname, opts)
   -- avoid circular require
-  local ext_config = require "telescope._extensions.egrepify.config"
-  local quiet = vim.F.if_nil(opts.quiet, ext_config.values.quiet)
+  local egrep_config = require "telescope._extensions.egrepify.config"
+  local quiet = vim.F.if_nil(opts.quiet, egrep_config.values.quiet)
   if not quiet then
     local level = vim.log.levels[opts.level]
     if not level then

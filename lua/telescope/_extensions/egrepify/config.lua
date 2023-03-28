@@ -1,11 +1,11 @@
-local ext_actions = require "telescope._extensions.egrepify.actions"
-local ext_utils = require "telescope._extensions.egrepify.utils"
+local egrep_actions = require "telescope._extensions.egrepify.actions"
+local egrep_utils = require "telescope._extensions.egrepify.utils"
 
 local actions = require "telescope.actions"
 local action_state = require "telescope.actions.state"
 local config = {}
 
-local title_suffix = string.format(" %s", ext_utils.repeat_char("─", 1000))
+local title_suffix = string.format(" %s", egrep_utils.repeat_char("─", 1000))
 
 _TelescopeEgrepifyConfig = {
   AND = true,
@@ -19,11 +19,11 @@ _TelescopeEgrepifyConfig = {
   grep_open_files = false,
   mappings = {
     i = {
-      ["<C-z>"] = ext_actions.toggle_prefixes,
-      ["<C-a>"] = ext_actions.toggle_and,
+      ["<C-z>"] = egrep_actions.toggle_prefixes,
+      ["<C-a>"] = egrep_actions.toggle_and,
     },
     n = {
-      ["z"] = ext_actions.toggle_prefixes,
+      ["z"] = egrep_actions.toggle_prefixes,
     },
   },
   prefixes = {
