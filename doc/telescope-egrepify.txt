@@ -111,6 +111,7 @@ PickerConfig                                                      *PickerConfig*
         {vimgrep_arguments}  (table)    args for `rg`, see |telescope.defaults.vimgrep_arguments|
         {use_prefixes}       (boolean)  use prefixes in prompt, toggleable with <C-z> (default: true)
         {AND}                (boolean)  search with fzf-like AND logic to ordered sub-tokens of prompt
+        {permutations}       (boolean)  search permutations of sub-tokens of prompt, implies AND true
         {prefixes}           (table)    prefixes for `rg` input, see |telescope-egrepify.prefix|
         {title_hl}           (string)   hl for title (default: `EgrepifyTitle` w/ link to `Title`)
         {title_suffix}       (string)   string after filename title (default: " " .. "──────────")
@@ -145,6 +146,11 @@ egrep_actions.toggle_prefixes()                  *egrep_actions.toggle_prefixes*
 
 egrep_actions.toggle_and()                            *egrep_actions.toggle_and*
      Toggle the use of AND-operator in the picker
+     @param prompt_bufnr number: The prompt bufnr
+
+
+egrep_actions.toggle_permutations()          *egrep_actions.toggle_permutations*
+     Toggle the use of permutations in the picker
      @param prompt_bufnr number: The prompt bufnr
 
 
