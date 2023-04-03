@@ -28,6 +28,7 @@ local flatten = vim.tbl_flatten
 ---@field vimgrep_arguments table args for `rg`, see |telescope.defaults.vimgrep_arguments|
 ---@field use_prefixes boolean use prefixes in prompt, toggleable with <C-z> (default: true)
 ---@field AND boolean search with fzf-like AND logic to ordered sub-tokens of prompt
+---@field permutations boolean search permutations of sub-tokens of prompt, implies AND true
 ---@field prefixes table prefixes for `rg` input, see |telescope-egrepify.prefix|
 ---@field title_hl string hl for title (default: `EgrepifyTitle` w/ link to `Title`)
 ---@field title_suffix string string after filename title (default: " " .. "──────────")
@@ -44,7 +45,6 @@ local Picker = {}
 ---@usage `require("telescope").extensions.egrepify.picker()`
 function Picker.picker(opts)
   opts = opts or {}
-
 
   -- opting out of prefixes
   for k, v in pairs(opts.prefixes) do
@@ -79,10 +79,14 @@ function Picker.picker(opts)
         prompt_args[#prompt_args + 1] = prefix_args
       end
     end
-    prompt = vim.trim(table.concat(tokens, " "))
-    -- matches everything in between sub-tokens of prompt
-    if current_picker.AND then
-      prompt = prompt:gsub("%s", ".*")
+    if not current_picker.permutations then
+      prompt = table.concat(tokens, " ")
+      -- matches everything in between sub-tokens of prompt
+      if current_picker.AND then
+        prompt = prompt:gsub("%s", ".*")
+      end
+    else -- matches everything in between sub-tokens and permutations
+      prompt = egrep_utils.permutations(tokens)
     end
     return flatten { args, prompt_args, "--", prompt, open_files }
   end, egrep_entry_maker(opts), opts.max_results, opts.cwd)
@@ -97,6 +101,12 @@ function Picker.picker(opts)
   picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, egrep_conf.use_prefixes)
   -- matches everything in between sub-tokens of prompt akin to fzf
   picker.AND = vim.F.if_nil(opts.AND, egrep_conf.AND)
+  -- matches everything in between sub-tokens and permutations
+  picker.permutations = vim.F.if_nil(opts.permutations, egrep_conf.permutations)
+
+  if picker.permutations then
+    picker.AND = true
+  end
 
   picker:find()
 end

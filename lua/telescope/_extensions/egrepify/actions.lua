@@ -44,5 +44,16 @@ function egrep_actions.toggle_and(prompt_bufnr)
   current_picker:refresh()
 end
 
+--- Toggle the use of permutations in the picker
+--- @param prompt_bufnr number: The prompt bufnr
+function egrep_actions.toggle_permutations(prompt_bufnr)
+  local current_picker = action_state.get_current_picker(prompt_bufnr)
+  current_picker.permutations = not current_picker.permutations
+  local msg = current_picker.permutations and "Permutations enabled" or "Permutations disabled"
+  dismiss_notifications()
+  egrep_utils.notify("picker", { msg = msg, level = "INFO" })
+  current_picker:refresh()
+end
+
 egrep_actions = transform_mod(egrep_actions)
 return egrep_actions

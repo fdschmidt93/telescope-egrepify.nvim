@@ -9,6 +9,7 @@ local title_suffix = string.format(" %s", egrep_utils.repeat_char("─", 1000))
 
 _TelescopeEgrepifyConfig = {
   AND = true,
+  permutations = false,
   lnum = true,
   lnum_hl = "EgrepifyLnum",
   col = false,
@@ -21,6 +22,7 @@ _TelescopeEgrepifyConfig = {
     i = {
       ["<C-z>"] = egrep_actions.toggle_prefixes,
       ["<C-a>"] = egrep_actions.toggle_and,
+      ["<C-r>"] = egrep_actions.toggle_permutations,
     },
     n = {
       ["z"] = egrep_actions.toggle_prefixes,
