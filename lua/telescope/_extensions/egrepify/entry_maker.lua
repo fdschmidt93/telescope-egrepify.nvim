@@ -1,73 +1,91 @@
-local entry_display = require "telescope.pickers.entry_display"
 local ts_utils = require "telescope.utils"
 local egrep_conf = require("telescope._extensions.egrepify.config").values
 
 local str = require "plenary.strings"
 
+local function collect(tbl)
+  local out = {}
+  for i = 1, 7 do
+    local val = tbl[i]
+    if val then
+      out[#out + 1] = val
+    end
+  end
+  return out
+end
+
+-- get the string width of a number without converting to string
+local function num_width(num)
+  return math.floor(math.log10(num) + 1)
+end
+
 local function line_display(entry, data, opts)
   entry = entry or {}
-  local lnum_col_str = table.concat(
-    vim.tbl_values {
-      opts.lnum and str.align_str(tostring(entry.lnum), 4, true) or nil,
-      opts.lnum and ":" or nil,
-      opts.col and str.align_str(tostring(entry.col), 3, true) or nil,
+  local file_devicon, devicon_hl
+  if opts.title == false then
+    file_devicon, devicon_hl = ts_utils.transform_devicons(entry.filename, entry.filename, false)
+  end
+  local lnum
+  local lnum_width = opts.lnum and (opts.lnum_width or num_width(entry.lnum)) or 0
+  local col_width = opts.col and (opts.col_width or num_width(entry.col)) or 0
+  if opts.lnum then
+    lnum = type(opts.lnum_width) == "number" and str.align_str(tostring(entry.lnum), opts.lnum_width, true)
+      or tostring(entry.lnum)
+  end
+  local col
+  if opts.col then
+    col = type(opts.col_width) == "number" and str.align_str(tostring(entry.col), opts.col_width, true)
+      or tostring(entry.col)
+  end
+  local display = table.concat(
+    collect {
+      [1] = file_devicon,
+      [2] = opts.title == false and ":" or nil,
+      [3] = lnum,
+      [4] = lnum and ":" or nil,
+      [5] = col,
+      [6] = (opts.lnum or opts.col) and " " or nil,
+      [7] = entry.ordinal,
     },
     ""
   )
-  local out = {}
-  if opts.lnum or opts.col then
-    out[#out + 1] = {
-      lnum_col_str,
-      function()
-        local hl_table = {}
-        if opts.lnum then
-          hl_table[#hl_table + 1] = { { 0, 4 }, opts.lnum_hl }
-        end
-        if opts.col then
-          hl_table[#hl_table + 1] = { { opts.lnum and 5 or 0, #lnum_col_str }, opts.col_hl }
-        end
-        if vim.tbl_isempty(hl_table) then
-          return { { 0, 1 }, "Normal" }
-        end
-        return hl_table
-      end,
-    }
+  local highlights = {}
+  local begin = 0
+  local end_ = 0
+  -- begin = end_ + 1 to skip the separators
+  if opts.title == false then
+    highlights[#highlights + 1] = { { begin, 3 }, devicon_hl }
+    begin = 4
+    end_ = #entry.filename + begin
+    highlights[#highlights + 1] = { { begin, end_ }, opts.filename_hl }
+    begin = end_ + 1
   end
-  out[#out + 1] = {
-    entry.ordinal,
-    function()
-      -- TODO: can we get proper selection highlighting?
-      -- local current_picker
-      -- local bufnr = vim.api.nvim_get_current_buf()
-      -- if vim.bo[bufnr].filetype == "TelescopePrompt" then
-      --   current_picker = action_state.get_current_picker(bufnr)
-      -- end
-      -- local tegrep_hl = "GruvboxFg3"
-      -- if current_picker then
-      --   if current_picker:is_multi_selected(entry) then
-      --     tegrep_hl = "TelescopeSelection"
-      --   end
-      -- end
-      local highlights = {}
-      local beginning = 0
-      if not vim.tbl_isempty(data["submatches"]) then
-        for _, submatch in ipairs(data["submatches"]) do
-          local s = submatch["start"]
-          local f = submatch["end"]
-          if opts.tegrep_hl then
-            highlights[#highlights + 1] = { { beginning, s }, opts.tegrep_hl }
-          end
-          highlights[#highlights + 1] = { { s, f }, "TelescopeMatching" }
-          beginning = f
-        end
-        if opts.tegrep_hl then
-          highlights[#highlights + 1] = { { beginning, #entry.text }, opts.tegrep_hl }
-        end
+  if lnum then
+    end_ = begin + lnum_width
+    highlights[#highlights + 1] = { { begin, end_ }, opts.lnum_hl }
+    begin = end_ + 1
+  end
+  if col then
+    end_ = begin + col_width
+    highlights[#highlights + 1] = { { begin, end_ }, opts.col_hl }
+    begin = end_ + 1
+  end
+  if not vim.tbl_isempty(data["submatches"]) then
+    local matches = data["submatches"]
+    for i = 1, #matches do
+      local submatch = matches[i]
+      local s, f = submatch["start"], submatch["end"]
+      if opts.egrep_hl then
+        highlights[#highlights + 1] = { { begin, begin + s }, opts.egrep_hl }
       end
-      return highlights
-    end,
-  }
-  return out
+      highlights[#highlights + 1] = { { begin + s, begin + f }, "TelescopeMatching" }
+      end_ = begin + f
+    end
+    if opts.egrep_hl then
+      highlights[#highlights + 1] = { { end_, end_ + #entry.ordinal }, opts.egrep_hl }
+    end
+  end
+  return display, highlights
 end
 
 local function title_display(filename, _, opts)
@@ -80,7 +98,7 @@ local function title_display(filename, _, opts)
         { { 1, 3 }, hl_group },
         {
           { 4, 4 + #display_filename },
-          opts.title_hl,
+          opts.filename_hl,
         },
         suffix_ ~= "" and {
           { 4 + #display_filename, 4 + #display_filename + #opts.title_suffix },
@@ -94,7 +112,7 @@ end
 
 return function(opts)
   opts = opts or {}
-  opts.title_hl = vim.F.if_nil(opts.title_hl, egrep_conf.title_hl)
+  opts.filename_hl = vim.F.if_nil(opts.filename_hl, egrep_conf.filename_hl)
   opts.title_suffix = vim.F.if_nil(opts.title_suffix, egrep_conf.title_suffix)
   opts.title_suffix_hl = vim.F.if_nil(opts.title_suffix_hl, egrep_conf.title_suffix_hl)
   opts.lnum = vim.F.if_nil(opts.lnum, egrep_conf.lnum)
@@ -136,7 +154,7 @@ return function(opts)
         -- 	return nil
         -- end
         local start = not vim.tbl_isempty(data["submatches"]) and data["submatches"][1]["start"] or 0
-        local line_displayer = entry_display.create(opts.display_line_create)
+        -- local line_displayer = entry_display.create(opts.display_line_create)
         local entry = {
           filename = data["path"]["text"],
           lnum = data["line_number"],
@@ -148,13 +166,14 @@ return function(opts)
         }
 
         local display = function()
-          return line_displayer(line_display(entry, data, opts))
+          -- return line_displayer(line_display(entry, data, opts))
+          return line_display(entry, data, opts)
         end
         entry.display = display
         return entry
       elseif
         -- parse beginning of rg output for a file
-        kind == "begin"
+        kind == "begin" and opts.title ~= false
       then
         local data = json_line["data"]
         local filename = data["path"]["text"]

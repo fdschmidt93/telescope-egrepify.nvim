@@ -30,8 +30,9 @@ local flatten = vim.tbl_flatten
 ---@field AND boolean search with fzf-like AND logic to ordered sub-tokens of prompt
 ---@field permutations boolean search permutations of sub-tokens of prompt, implies AND true
 ---@field prefixes table prefixes for `rg` input, see |telescope-egrepify.prefix|
----@field title_hl string hl for title (default: `EgrepifyTitle` w/ link to `Title`)
----@field title_suffix string string after filename title (default: " " .. "──────────")
+---@field filename_hl string hl for title (default: `EgrepifyTitle` w/ link to `Title`)
+---@field title boolean filename as title, false to inline (default: true)
+---@field title_suffix string string after filename title, only if `title == true` (default: " " .. "──────────")
 ---@field title_suffix_hl string title suffix hl [`EgrepifySuffix`, links to `Comment`]
 ---@field lnum boolean include lnum in result entry
 ---@field lnum_hl string lnum hl [`EgrepifyLnum`, links to `Constant`]
@@ -39,6 +40,12 @@ local flatten = vim.tbl_flatten
 ---@field col_hl string col hl (default: `EgrepifyCol`, links to `Constant`)
 
 local Picker = {}
+
+-- Show deprecation message `msg` once
+--@field field string deprecation message to display
+local deprecate = function(msg)
+  vim.notify_once(msg, vim.log.levels.WARN, { title = "telescope-egrepify" })
+end
 
 ---telescope-egrepify picker
 ---@param opts PickerConfig see |telescope-egrepify.picker.PickerConfig|
@@ -51,6 +58,13 @@ function Picker.picker(opts)
     if v == false then
       opts.prefixes[k] = nil
     end
+  end
+
+  ---@diagnostic disable-next-line: undefined-field
+  if opts.title_hl then
+    deprecate "title_hl is deprecated, use filename_hl instead"
+    ---@diagnostic disable-next-line: undefined-field
+    opts.filename_hl = opts.title_hl
   end
 
   local vimgrep_arguments = opts.vimgrep_arguments or conf.vimgrep_arguments
