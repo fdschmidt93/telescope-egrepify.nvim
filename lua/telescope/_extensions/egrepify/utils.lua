@@ -89,4 +89,24 @@ M._get_open_files = function(cwd)
   return open_buffers
 end
 
+--- Return regex to match all permutations of tokens with wildcards inbetween
+---@param tokens string[]: the prompt tokens
+---@return string: the regex pattern
+M.permutations = function(tokens)
+  local result = {}
+  local function permute(tokens_, i, n)
+    if i == n then
+      table.insert(result, table.concat(tokens_, ".*"))
+    else
+      for j = i, n do
+        tokens_[i], tokens_[j] = tokens_[j], tokens_[i]
+        permute(tokens_, i + 1, n)
+        tokens_[i], tokens_[j] = tokens_[j], tokens_[i]
+      end
+    end
+  end
+  permute(tokens, 1, #tokens)
+  return string.format("%s%s%s", "(", table.concat(result, "|"), ")")
+end
+
 return M

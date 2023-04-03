@@ -112,6 +112,7 @@ require("telescope").setup {
       -- intersect tokens in prompt ala "str1.*str2" that ONLY matches
       -- if str1 and str2 are consecutively in line with anything in between (wildcard)
       AND = true,                  -- default
+      permutations = false,        -- opt-in to imply AND & match all permutations of prompt tokens
       lnum = true,                 -- default, not required
       lnum_hl = "EgrepifyLnum",    -- default, not required, links to `Constant`
       col = false,                 -- default, not required
