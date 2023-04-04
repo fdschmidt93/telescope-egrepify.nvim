@@ -15,6 +15,7 @@ _TelescopeEgrepifyConfig = {
   col = false,
   col_hl = "EgrepifyCol",
   use_prefixes = true,
+  title_hl = "EgrepifyTitle",
   title_suffix = title_suffix,
   title_suffix_hl = "EgrepifySuffix",
   grep_open_files = false,
