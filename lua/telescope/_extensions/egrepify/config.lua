@@ -28,9 +28,6 @@ _TelescopeEgrepifyConfig = {
       ["<C-a>"] = egrep_actions.toggle_and,
       ["<C-r>"] = egrep_actions.toggle_permutations,
     },
-    n = {
-      ["z"] = egrep_actions.toggle_prefixes,
-    },
   },
   prefixes = {
     -- filter for file suffixes

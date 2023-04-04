@@ -1,12 +1,12 @@
 # telescope-egripfy.nvim
 
-In brief, this [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)-extension is my personal alternative to [telescope-live-grep-args.nvim](https://github.com/nvim-telescope/telescope-live-grep-args.nvim).
+`telescope-egripfy.nvim` is a [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)-extension that enhances live grepping with opinionated defaults and functionality.
 
 ## Features
 
 - Extensible prefix-based CLI parsing for `ripgrep`, e.g. by default `#md,lua sorter` would look for sorter in files with `md` or `lua` extensions
+- Better (opinionated) defaults like `AND` for tokens in prompt: `this here` expands to "this*.here" in regex matching this, any characters in between, __and__ here
 - Custom entry maker to parse `ripgrep` json to separate filenames as "section titles" (inspired by [consult.el](https://github.com/minad/consult)), configure line and column numbers, and perform accurate line highlighting
-- Usable defaults the author likes like `AND` operator for tokens in prompt
 
 ## Motivation
 
@@ -21,7 +21,7 @@ The core functionality of `telescope-egripfy.nvim` are `prefixes`. What you need
 
 - Prefixes seamlessly expand user-specific `ripgrep` flags on-the-fly
 - The below prefixes are the builtin-defaults with examples on how they are used
-- During search, you can toggle the use of prefixs by hitting <C-z> (z) in insert (normal) mode
+- During search, you can toggle the use of prefixes by hitting <C-z> (z) in insert (normal) mode
 - The configuration section shows how to opt out of a default and add another prefix.
 
 ```lua
@@ -106,6 +106,8 @@ require "telescope".extensions.egrepify.egrepify {}
 The below configuration reflects defaults and examples on how to customize `telescope-egripfy.nvim` to your liking.
 
 ```lua
+local egrep_actions = require "telescope._extensions.egrepify.actions"
+
 require("telescope").setup {
   extensions = {
     egrepify = {
@@ -117,7 +119,8 @@ require("telescope").setup {
       lnum_hl = "EgrepifyLnum",       -- default, not required, links to `Constant`
       col = false,                    -- default, not required
       col_hl = "EgrepifyCol",         -- default, not required, links to `Constant`
-      filename_hl = "EgrepifyFile",  -- default, not required, links to `Title`
+      title = true,                   -- default, not required, show filename as title rather than inline
+      filename_hl = "EgrepifyFile",   -- default, not required, links to `Title`
       -- suffix = long line, see screenshot
       -- EXAMPLE ON HOW TO ADD PREFIX!
       prefixes = {
@@ -132,12 +135,15 @@ require("telescope").setup {
         -- ^ is not a default prefix and safe example
         ["^"] = false
       },
+      -- default mappings
       mappings = {
         i = {
-          ["<C-z>"] = ext_actions.toggle_prefixes,
-        },
-        n = {
-          ["z"] = ext_actions.toggle_prefixes,
+          -- toggle prefixes, prefixes is default
+          ["<C-z>"] = egrep_actions.toggle_prefixes,
+          -- toggle AND, AND is default, AND matches tokens and any chars in between
+          ["<C-a>"] = egrep_actions.toggle_and,
+          -- toggle permutations, permutations of tokens is opt-in
+          ["<C-r>"] = egrep_actions.toggle_permutations,
         },
       },
     },
@@ -149,13 +155,15 @@ require("telescope").load_extension "egrepify"
 # Mappings
 
 
-| Insert / Normal | egrepify_actions           | Description                                                                      |
+| Insert mode | egrepify_actions           | Description                                                                      |
 | --------------- | -------------------- | -------------------------------------------------------------------------------- |
-| `<C-z>/z`       | toggle_prefixes               | Toggle using prefixes on and off (default: on)    |
+| `<C-z>`       | toggle_prefixes               | Toggle using prefixes on and off (default: on)    |
+| `<C-a>`       | toggle_and               | Toggle using AND on and off (default: on)    |
+| `<C-r>`       | toggle_permutations               | Toggle matching permutations (implies AND) on and off (default: off)    |
 
 # DISCLAIMER
 
-Please consider forking for your own customization or well-formed PRs instead to fix issues or add new features. This extension foremost serves my own needs and turned into a plugin as maybe other users may want to personalize `rg` via `telescope.nvim` in similar fashion. While many options _are_ configurable, frankly, I will not promise long-term maintenance beyond review (and hopefully merging) of PRs.
+Please consider forking for your own customization or well-formed PRs instead to fix issues or add new features. This extension foremost serves my own needs and turned into a plugin as maybe other users may want to personalize `rg` via `telescope.nvim` in similar fashion. Many options _are_ configurable, but I would like to avoid added maintenace burden beyond review (and hopefully merging) of PRs.
 
 # Naming
 
