@@ -113,8 +113,9 @@ PickerConfig                                                      *PickerConfig*
         {AND}                (boolean)  search with fzf-like AND logic to ordered sub-tokens of prompt
         {permutations}       (boolean)  search permutations of sub-tokens of prompt, implies AND true
         {prefixes}           (table)    prefixes for `rg` input, see |telescope-egrepify.prefix|
-        {title_hl}           (string)   hl for title (default: `EgrepifyTitle` w/ link to `Title`)
-        {title_suffix}       (string)   string after filename title (default: " " .. "──────────")
+        {filename_hl}        (string)   hl for title (default: `EgrepifyTitle` w/ link to `Title`)
+        {title}              (boolean)  filename as title, false to inline (default: true)
+        {title_suffix}       (string)   string after filename title, only if `title == true` (default: " " .. "──────────")
         {title_suffix_hl}    (string)   title suffix hl [`EgrepifySuffix`, links to `Comment`]
         {lnum}               (boolean)  include lnum in result entry
         {lnum_hl}            (string)   lnum hl [`EgrepifyLnum`, links to `Constant`]
