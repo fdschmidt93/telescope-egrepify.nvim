@@ -30,12 +30,12 @@ local function line_display(entry, data, opts)
   local col_width = opts.col and (opts.col_width or num_width(entry.col)) or 0
   if opts.lnum then
     lnum = type(opts.lnum_width) == "number" and str.align_str(tostring(entry.lnum), opts.lnum_width, true)
-      or tostring(entry.lnum)
+        or tostring(entry.lnum)
   end
   local col
   if opts.col then
     col = type(opts.col_width) == "number" and str.align_str(tostring(entry.col), opts.col_width, true)
-      or tostring(entry.col)
+        or tostring(entry.col)
   end
   local display = table.concat(
     collect {
@@ -98,17 +98,17 @@ local function title_display(filename, _, opts)
   local display, hl_group = ts_utils.transform_devicons(display_filename, display_filename .. suffix_, false)
   if hl_group then
     return display,
-      {
-        { { 1, 3 }, hl_group },
         {
-          { 4, 4 + #display_filename },
-          opts.filename_hl,
-        },
-        suffix_ ~= "" and {
-          { 4 + #display_filename, 4 + #display_filename + #opts.title_suffix },
-          opts.title_suffix_hl,
-        } or nil,
-      }
+          { { 0, 3 }, hl_group },
+          {
+            { 4, 4 + #display_filename },
+            opts.filename_hl,
+          },
+          suffix_ ~= "" and {
+            { 4 + #display_filename, 4 + #display_filename + #opts.title_suffix },
+            opts.title_suffix_hl,
+          } or nil,
+        }
   else
     return display
   end
@@ -180,8 +180,8 @@ return function(opts)
         entry.display = display
         return entry
       elseif
-        -- parse beginning of rg output for a file
-        kind == "begin" and opts.title ~= false
+      -- parse beginning of rg output for a file
+          kind == "begin" and opts.title ~= false
       then
         local data = json_line["data"]
         local filename = data["path"]["text"]
