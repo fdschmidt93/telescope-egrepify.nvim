@@ -152,11 +152,15 @@ return function(opts)
     if json_line then
       if kind == "match" then
         local data = json_line["data"]
-        local text = data["lines"]["text"]:gsub("\n", " ")
-        data.text = text
-        -- if text == " " then
-        -- 	return nil
-        -- end
+        local lines = data["lines"]
+        if not lines then
+          return
+        end
+        local text = lines["text"]
+        if not text then
+          return
+        end
+        text = text:gsub("\n", " ")
         local start = not vim.tbl_isempty(data["submatches"]) and data["submatches"][1]["start"] or 0
         -- local line_displayer = entry_display.create(opts.display_line_create)
         local entry = {
