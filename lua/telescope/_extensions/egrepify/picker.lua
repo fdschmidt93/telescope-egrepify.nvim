@@ -25,6 +25,7 @@ local flatten = vim.tbl_flatten
 ---@class PickerConfig
 ---@field cwd string directory to run `rg` input
 ---@field grep_open_files boolean search only open files (default: false)
+---@field search_dirs string[] directory/directories/files to search, mutually excl. with `grep_open_files`(default: false)
 ---@field vimgrep_arguments table args for `rg`, see |telescope.defaults.vimgrep_arguments|
 ---@field use_prefixes boolean use prefixes in prompt, toggleable with <C-z> (default: true)
 ---@field AND boolean search with fzf-like AND logic to ordered sub-tokens of prompt
@@ -52,6 +53,14 @@ end
 ---@usage `require("telescope").extensions.egrepify.picker()`
 function Picker.picker(opts)
   opts = opts or {}
+
+  local search_dirs = vim.F.if_nil(opts.search_dirs, {})
+
+  if search_dirs then
+    for i, path in ipairs(search_dirs) do
+      search_dirs[i] = vim.fn.expand(path)
+    end
+  end
 
   -- opting out of prefixes
   for k, v in pairs(opts.prefixes) do
@@ -102,7 +111,10 @@ function Picker.picker(opts)
     else -- matches everything in between sub-tokens and permutations
       prompt = egrep_utils.permutations(tokens)
     end
-    return flatten { args, prompt_args, "--", prompt, open_files }
+
+    local search_list = #open_files > 0 and open_files or search_dirs
+
+    return flatten { args, prompt_args, "--", prompt, search_list }
   end, egrep_entry_maker(opts), opts.max_results, opts.cwd)
 
   local picker = pickers.new(opts, {
