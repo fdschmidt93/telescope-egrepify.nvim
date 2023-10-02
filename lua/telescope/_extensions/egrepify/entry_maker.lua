@@ -188,6 +188,7 @@ return function(opts)
         return {
           value = filename,
           ordinal = filename,
+          filename = filename,
           kind = kind,
           display = function()
             return opts.title_display(filename, data, opts)

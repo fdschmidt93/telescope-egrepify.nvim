@@ -22,6 +22,24 @@ local flatten = vim.tbl_flatten
 --- The available configuration options are listed at |telescope-egrepify.picker.PickerConfig|.
 ---@brief ]]
 
+-- sorting_strategy "descending" puts title "after" matches, while "ascending" has title "before" matches
+local descending_sorter = sorters.new {
+  scoring_function = function()
+    -- telescope does not manage entries if score is 1
+    -- required to activate `tiebreak`
+    return 0
+  end,
+}
+
+local descending_tiebreak = function(current_entry, existing_entry)
+  if current_entry.filename == existing_entry.filename then
+    if existing_entry.kind == "begin" then
+      return true
+    end
+  end
+  return false
+end
+
 ---@class PickerConfig
 ---@field cwd string directory to run `rg` input
 ---@field grep_open_files boolean search only open files (default: false)
@@ -39,6 +57,7 @@ local flatten = vim.tbl_flatten
 ---@field lnum_hl string lnum hl [`EgrepifyLnum`, links to `Constant`]
 ---@field col boolean include col in result entry
 ---@field col_hl string col hl (default: `EgrepifyCol`, links to `Constant`)
+---@field sorting_strategy string see |telescope.defaults.sorting_strategy|, "descending" has slight perf. hit
 
 local Picker = {}
 
@@ -117,12 +136,20 @@ function Picker.picker(opts)
     return flatten { args, prompt_args, "--", prompt, search_list }
   end, egrep_entry_maker(opts), opts.max_results, opts.cwd)
 
+  local sorting_strategy = vim.F.if_nil(opts.sorting_strategy, require("telescope.config").values.sorting_strategy)
+  local is_descending = sorting_strategy == "descending"
+  local tiebreak = is_descending and descending_tiebreak or nil
+  local sorter = is_descending and descending_sorter or sorters.empty()
+
   local picker = pickers.new(opts, {
     prompt_title = "Live Grep",
     finder = live_grepper,
-    default_selection_index = 2,
+    -- slight hack that should be simple and work well in practice
+    -- descending puts title "after" matches, while ascending has title "before" matches
+    default_selection_index = is_descending and 1 or 2,
     previewer = conf.grep_previewer(opts),
-    sorter = sorters.empty(),
+    sorter = sorter,
+    tiebreak = tiebreak,
   })
   picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, egrep_conf.use_prefixes)
   -- matches everything in between sub-tokens of prompt akin to fzf
