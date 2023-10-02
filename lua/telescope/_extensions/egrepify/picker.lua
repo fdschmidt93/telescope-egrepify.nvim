@@ -53,6 +53,14 @@ end
 function Picker.picker(opts)
   opts = opts or {}
 
+  local search_dirs = opts.search_dirs
+
+  if search_dirs then
+    for i, path in ipairs(search_dirs) do
+      search_dirs[i] = vim.fn.expand(path)
+    end
+  end
+
   -- opting out of prefixes
   for k, v in pairs(opts.prefixes) do
     if v == false then
@@ -102,7 +110,16 @@ function Picker.picker(opts)
     else -- matches everything in between sub-tokens and permutations
       prompt = egrep_utils.permutations(tokens)
     end
-    return flatten { args, prompt_args, "--", prompt, open_files }
+
+    local search_list = {}
+
+    if #open_files > 0 then
+      search_list = open_files
+    elseif search_dirs then
+      search_list = search_dirs
+    end
+
+    return flatten { args, prompt_args, "--", prompt, search_list }
   end, egrep_entry_maker(opts), opts.max_results, opts.cwd)
 
   local picker = pickers.new(opts, {
