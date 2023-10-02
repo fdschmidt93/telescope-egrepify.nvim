@@ -106,21 +106,22 @@ You can access the picker with defaults and user-configuration by calling
 PickerConfig                                                      *PickerConfig*
 
     Fields: ~
-        {cwd}                (string)   directory to run `rg` input
-        {grep_open_files}    (boolean)  search only open files (default: false)
-        {vimgrep_arguments}  (table)    args for `rg`, see |telescope.defaults.vimgrep_arguments|
-        {use_prefixes}       (boolean)  use prefixes in prompt, toggleable with <C-z> (default: true)
-        {AND}                (boolean)  search with fzf-like AND logic to ordered sub-tokens of prompt
-        {permutations}       (boolean)  search permutations of sub-tokens of prompt, implies AND true
-        {prefixes}           (table)    prefixes for `rg` input, see |telescope-egrepify.prefix|
-        {filename_hl}        (string)   hl for title (default: `EgrepifyFile` w/ link to `Title`)
-        {title}              (boolean)  filename as title, false to inline (default: true)
-        {title_suffix}       (string)   string after filename title, only if `title == true` (default: " " .. "──────────")
-        {title_suffix_hl}    (string)   title suffix hl [`EgrepifySuffix`, links to `Comment`]
-        {lnum}               (boolean)  include lnum in result entry
-        {lnum_hl}            (string)   lnum hl [`EgrepifyLnum`, links to `Constant`]
-        {col}                (boolean)  include col in result entry
-        {col_hl}             (string)   col hl (default: `EgrepifyCol`, links to `Constant`)
+        {cwd}                (string)    directory to run `rg` input
+        {grep_open_files}    (boolean)   search only open files (default: false)
+        {search_dirs}        (string[])  directory/directories/files to search, mutually excl. with `grep_open_files`(default: false)
+        {vimgrep_arguments}  (table)     args for `rg`, see |telescope.defaults.vimgrep_arguments|
+        {use_prefixes}       (boolean)   use prefixes in prompt, toggleable with <C-z> (default: true)
+        {AND}                (boolean)   search with fzf-like AND logic to ordered sub-tokens of prompt
+        {permutations}       (boolean)   search permutations of sub-tokens of prompt, implies AND true
+        {prefixes}           (table)     prefixes for `rg` input, see |telescope-egrepify.prefix|
+        {filename_hl}        (string)    hl for title (default: `EgrepifyFile` w/ link to `Title`)
+        {title}              (boolean)   filename as title, false to inline (default: true)
+        {title_suffix}       (string)    string after filename title, only if `title == true` (default: " " .. "──────────")
+        {title_suffix_hl}    (string)    title suffix hl [`EgrepifySuffix`, links to `Comment`]
+        {lnum}               (boolean)   include lnum in result entry
+        {lnum_hl}            (string)    lnum hl [`EgrepifyLnum`, links to `Constant`]
+        {col}                (boolean)   include col in result entry
+        {col_hl}             (string)    col hl (default: `EgrepifyCol`, links to `Constant`)
 
 
 Picker.picker({opts})                                            *Picker.picker*
