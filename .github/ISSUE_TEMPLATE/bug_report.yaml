@@ -1,0 +1,87 @@
+name: Bug report
+description: Report a problem with telescope-egrepify.nvim
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before reporting: search [existing issues](https://github.com/fdschmidt93/telescope-egrepify.nvim/issues) and make sure that both telescope, telescope-egrepify and its dependencies are updated to the latest version.
+  - type: textarea
+    attributes:
+      label: "Description"
+      description: "A short description of the problem you are reporting."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Neovim version"
+      description: "Output of `nvim --version`"
+      render: markdown
+      placeholder: |
+        NVIM v0.10.0-dev-1205+gf9944a78bc
+        Build type: RelWithDebInfo
+        LuaJIT 2.1.0-beta3
+        Run "nvim -V1 -v" for more info
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: "Operating system and version"
+      placeholder: "macOS 11.5"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Steps to reproduce"
+      description: "Steps to reproduce using the minimal config provided below."
+      placeholder: |
+        1. `nvim -nu minimal.lua`
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Expected behavior"
+      description: "A description of the behavior you expected:"
+  - type: textarea
+    attributes:
+      label: "Actual behavior"
+      description: "Observed behavior (may optionally include logs, images, or videos)."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+       label: "Minimal config"
+       description: "Minimal(!) configuration necessary to reproduce the issue. Save this as `minimal.lua`. If _absolutely_ necessary, add plugins and config options from your `init.lua` at the indicated lines."
+       render: Lua
+       value: |
+         vim.cmd [[set runtimepath=$VIMRUNTIME]]
+         vim.cmd [[set packpath=/tmp/nvim/site]]
+         local package_root = "/tmp/nvim/site/pack"
+         local lazypath = package_root .. "/lazy/lazy.nvim"
+         local pluginpath = package_root .. "/plugins/"
+         if not vim.loop.fs_stat(lazypath) then
+           print "Installing 'folke/lazy.nvim'..."
+           vim.fn.system { "git", "clone", "https://github.com/folke/lazy.nvim.git", lazypath }
+         end
+         vim.opt.rtp:prepend(lazypath)
+
+         require("lazy").setup({
+           {
+             "fdschmidt93/telescope-egrepify.nvim",
+             keys = {
+               { "<space>rg", "<CMD>Telescope egrepify<CR>", mode = { "n", "i", "v" } },
+             },
+           },
+           {
+             "nvim-telescope/telescope.nvim",
+             dependencies = "nvim-lua/plenary.nvim",
+             config = function()
+               require("telescope").setup {}
+               require("telescope").load_extension "egrepify"
+             end,
+           },
+         }, { root = pluginpath })
+    validations:
+      required: true
+
