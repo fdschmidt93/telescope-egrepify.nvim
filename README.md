@@ -1,6 +1,6 @@
-# telescope-egripfy.nvim
+# telescope-egrepify.nvim
 
-`telescope-egripfy.nvim` is a [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)-extension that enhances live grepping with opinionated defaults and functionality.
+`telescope-egrepify.nvim` is a [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim)-extension that enhances live grepping with opinionated defaults and functionality.
 
 ## Features
 
@@ -10,14 +10,14 @@
 
 ## Motivation
 
-Fuzzy-search is often not great at filtering results. 99% of my time, I mostly want to restrict searches by `AND` (intersection of words in search prompt) and files. `ripgrep` syntax is not _as_ trivial as `fzf` but with, e.g., helpers like `telescope-egripfy`'s prefixes enables more precise finding and filtering.
+Fuzzy-search is often not great at filtering results. 99% of my time, I mostly want to restrict searches by `AND` (intersection of words in search prompt) and files. `ripgrep` syntax is not _as_ trivial as `fzf` but with, e.g., helpers like `telescope-egrepify`'s prefixes enables more precise finding and filtering.
 
 ![Screenshot](https://user-images.githubusercontent.com/39233597/226608982-b3400cea-3aca-499c-afb3-51912443a240.png)
 The screenshot shows searching for `require` only in files with `md` extension (i.e. markdown files). For more prefixes and configuration, see [Prefixes](#prefixes).
 
 # Prefixes
 
-The core functionality of `telescope-egripfy.nvim` are `prefixes`. What you need to know at a glance:
+The core functionality of `telescope-egrepify.nvim` are `prefixes`. What you need to know at a glance:
 
 - Prefixes seamlessly expand user-specific `ripgrep` flags on-the-fly
 - The below prefixes are the builtin-defaults with examples on how they are used
@@ -103,7 +103,7 @@ require "telescope".extensions.egrepify.egrepify {}
 
 # Configuration
 
-The below configuration reflects defaults and examples on how to customize `telescope-egripfy.nvim` to your liking.
+The below configuration reflects defaults and examples on how to customize `telescope-egrepify.nvim` to your liking.
 
 ```lua
 local egrep_actions = require "telescope._extensions.egrepify.actions"

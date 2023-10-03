@@ -17,7 +17,7 @@
 
 ---@tag telescope-egrepify.prefix Prefix
 ---@brief [[
----The core functionality of `telescope-egripfy.nvim` are `prefixes`.
+---The core functionality of `telescope-egrepify.nvim` are `prefixes`.
 ---The below prefixes are the builtin-defaults. Should you want to use
 ---extension, please __carefully__ read the table below on how a prefix
 ---is added. The configuration section shows how to add another prefix.
