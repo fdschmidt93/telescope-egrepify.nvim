@@ -50,7 +50,7 @@ The core functionality of `telescope-egrepify.nvim` are `prefixes`. What you nee
           return string.format([[**/{%s}*/**]], input)
       end,
   },
-  -- filter for (partial) folder names
+  -- filter for (partial) file names
   -- example prompt: &egrep $MY_PROMPT
   -- searches with ripgrep prompt $MY_PROMPT in paths that have "egrep" in file name
   -- i.e. rg --glob="*egrep*" -- $MY_PROMPT
