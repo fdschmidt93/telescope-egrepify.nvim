@@ -107,16 +107,19 @@ local function title_display(filename, _, opts)
   local display_filename = ts_utils.transform_path({ cwd = opts.cwd }, filename)
   local suffix_ = opts.title_suffix or ""
   local display, hl_group = ts_utils.transform_devicons(display_filename, display_filename .. suffix_, false)
+  local offset = find_whitespace(display)
+  local end_filename = offset + #display_filename
+  local end_suffix = end_filename + #opts.title_suffix
   if hl_group then
     return display,
       {
-        { { 0, 3 }, hl_group },
+        { { 0, offset }, hl_group },
         {
-          { 4, 4 + #display_filename },
+          { offset, end_filename },
           opts.filename_hl,
         },
         suffix_ ~= "" and {
-          { 4 + #display_filename, 4 + #display_filename + #opts.title_suffix },
+          { end_filename, end_suffix },
           opts.title_suffix_hl,
         } or nil,
       }
