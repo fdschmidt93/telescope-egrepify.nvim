@@ -6,6 +6,7 @@ local pickers = require "telescope.pickers"
 local sorters = require "telescope.sorters"
 local conf = require("telescope.config").values
 local egrep_conf = require("telescope._extensions.egrepify.config").values
+local actions = require "telescope.actions"
 
 local flatten = vim.tbl_flatten
 
@@ -151,6 +152,8 @@ function Picker.picker(opts)
     sorter = sorter,
     tiebreak = tiebreak,
   })
+  -- caching opts to be able to remove `title` from opts for entry maker for fuzzy refine
+  picker._opts = opts
   picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, egrep_conf.use_prefixes)
   -- matches everything in between sub-tokens of prompt akin to fzf
   picker.AND = vim.F.if_nil(opts.AND, egrep_conf.AND)

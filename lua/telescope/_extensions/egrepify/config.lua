@@ -70,6 +70,23 @@ _TelescopeEgrepifyConfig = {
         end,
       }
     end
+    actions.to_fuzzy_refine:enhance {
+      pre = function()
+        local current_picker = require("telescope.actions.state").get_current_picker(prompt_bufnr)
+        -- modifying table which has entry maker options
+        current_picker._opts.title = false
+        local entry_manager = current_picker.manager
+        -- creating new LinkedList without "title" lines
+        local list_excl_titles = require("telescope.algos.linked_list"):new { track_at = entry_manager.max_results }
+        for val in entry_manager.linked_states:iter() do
+          if val[1].kind == "match" then
+            list_excl_titles:append(val)
+          end
+        end
+        entry_manager.linked_states = list_excl_titles
+        current_picker:refresh()
+      end,
+    }
     actions.send_to_qflist:enhance {
       -- ensure "title" lines are not sent to qflist
       pre = function()
