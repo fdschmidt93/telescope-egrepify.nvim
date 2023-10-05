@@ -182,7 +182,7 @@ return function(opts)
         local lnum = data["line_number"]
         local col = start + 1
         local entry = {
-          filename = Path:new(opts.cwd, data["path"]["text"]).filename,
+          filename = opts.cwd .. Path.path.sep .. data["path"]["text"],
           lnum = lnum,
           text = text,
           -- byte offset zero-indexed
