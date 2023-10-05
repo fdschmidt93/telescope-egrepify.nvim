@@ -96,12 +96,12 @@ local get_ts_highlights = function(path)
   if lang then
     local bufnr, loaded
     -- check if buffer is opened
-    local buffers = vim
-      .iter(vim.api.nvim_list_bufs())
-      :filter(function(b)
-        return vim.api.nvim_buf_get_name(b) == path
-      end)
-      :totable()
+    local buffers = {}
+    for _, b in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_get_name(b) == path then
+        buffers[#buffers + 1] = b
+      end
+    end
     if #buffers == 1 then
       bufnr = buffers[1]
     else
