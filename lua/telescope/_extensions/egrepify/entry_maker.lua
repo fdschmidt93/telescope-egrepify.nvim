@@ -1,6 +1,7 @@
 local ts_utils = require "telescope.utils"
 local egrep_conf = require("telescope._extensions.egrepify.config").values
 
+local Path = require "plenary.path"
 local str = require "plenary.strings"
 
 local function collect(tbl)
@@ -164,7 +165,7 @@ return function(opts)
         local start = not vim.tbl_isempty(data["submatches"]) and data["submatches"][1]["start"] or 0
         -- local line_displayer = entry_display.create(opts.display_line_create)
         local entry = {
-          filename = data["path"]["text"],
+          filename = Path:new(opts.cwd, data["path"]["text"]).filename,
           lnum = data["line_number"],
           -- byte offset zero-indexed
           col = start + 1,
