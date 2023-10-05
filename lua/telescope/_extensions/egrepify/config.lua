@@ -22,11 +22,13 @@ _TelescopeEgrepifyConfig = {
   title_suffix = title_suffix,
   title_suffix_hl = "EgrepifySuffix",
   grep_open_files = false,
+  results_ts_hl = false,
   mappings = {
     i = {
       ["<C-z>"] = egrep_actions.toggle_prefixes,
       ["<C-a>"] = egrep_actions.toggle_and,
       ["<C-r>"] = egrep_actions.toggle_permutations,
+      ["<c-space>"] = actions.to_fuzzy_refine
     },
   },
   prefixes = {
@@ -52,8 +54,7 @@ _TelescopeEgrepifyConfig = {
       end,
     },
   },
-  attach_mappings = function(prompt_bufnr, map)
-    map("i", "<c-space>", actions.to_fuzzy_refine)
+  attach_mappings = function(prompt_bufnr)
     -- ensure "title" lines are not selected when iterating selections
     for _, key in ipairs {
       "move_selection_next",

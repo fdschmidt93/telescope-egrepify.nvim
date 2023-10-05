@@ -58,9 +58,13 @@ end
 ---@field lnum_hl string lnum hl [`EgrepifyLnum`, links to `Constant`]
 ---@field col boolean include col in result entry
 ---@field col_hl string col hl (default: `EgrepifyCol`, links to `Constant`)
+---@field results_ts_hl boolean highlight results entries with treesitter, may increase latency!
 ---@field sorting_strategy string see |telescope.defaults.sorting_strategy|, "descending" has slight perf. hit
 
 local Picker = {}
+
+-- storage for 'cached' egrepify-specific picker opts
+local cached_opts = {}
 
 -- Show deprecation message `msg` once
 --@field field string deprecation message to display
@@ -115,6 +119,15 @@ function Picker.picker(opts)
     if vim.bo[bufnr].filetype == "TelescopePrompt" then
       current_picker = action_state.get_current_picker(bufnr)
     end
+
+    -- restore internal options, should only be nil if picker was cached
+    -- unfortunately currently no other way to detect if it was cached or not
+    if current_picker and current_picker.use_prefixes == nil and current_picker.AND == nil then
+      for k, v in pairs(cached_opts) do
+        current_picker[k] = v
+      end
+    end
+
     if current_picker and current_picker.use_prefixes == true then
       for prefix, prefix_opts in pairs(opts.prefixes) do
         local prefix_args
@@ -142,7 +155,8 @@ function Picker.picker(opts)
   local tiebreak = is_descending and descending_tiebreak or nil
   local sorter = is_descending and descending_sorter or sorters.empty()
 
-  local picker = pickers.new(opts, {
+  local picker -- so we can refer to picker in actions.close:enhance
+  picker = pickers.new(opts, {
     prompt_title = "Live Grep",
     finder = live_grepper,
     -- slight hack that should be simple and work well in practice
@@ -151,6 +165,19 @@ function Picker.picker(opts)
     previewer = conf.grep_previewer(opts),
     sorter = sorter,
     tiebreak = tiebreak,
+    attach_mappings = function()
+      actions.close:enhance {
+        post = function()
+          if picker.cache_picker then
+            cached_opts._opts = picker._opts
+            cached_opts.use_prefixes = picker.use_prefixes
+            cached_opts.AND = picker.AND
+            cached_opts.permutations = picker.permutations
+          end
+        end,
+      }
+      return true
+    end,
   })
   -- caching opts to be able to remove `title` from opts for entry maker for fuzzy refine
   picker._opts = opts
