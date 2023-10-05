@@ -105,10 +105,11 @@ local get_ts_highlights = function(path)
     if #buffers == 1 then
       bufnr = buffers[1]
     else
+      -- TODO: maybe change with reading file into temporary buffer ala plenary
       bufnr = vim.fn.bufadd(path)
       vim.fn.bufload(bufnr)
       -- trying to preempt issues
-      pcall(vim.api.nvim_buf_set_name, bufnr, "tmp_" .. path)
+      pcall(vim.api.nvim_buf_set_name, bufnr, path)
       vim.go.eventignore = ei
       loaded = true
     end
