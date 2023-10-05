@@ -177,16 +177,15 @@ return function(opts)
         end
         text = text:gsub("\n", " ")
         local start = not vim.tbl_isempty(data["submatches"]) and data["submatches"][1]["start"] or 0
-        -- local line_displayer = entry_display.create(opts.display_line_create)
         local filename = data["path"]["text"]
         local lnum = data["line_number"]
+        -- byte offset zero-indexed
         local col = start + 1
         local entry = {
           filename = filename,
           path = opts.cwd .. os_sep .. filename,
           lnum = lnum,
           text = text,
-          -- byte offset zero-indexed
           col = col,
           value = data,
           ordinal = string.format("%s:%s:%s:%s", filename, lnum, col, text),
@@ -194,7 +193,6 @@ return function(opts)
         }
 
         local display = function()
-          -- return line_displayer(line_display(entry, data, opts))
           return line_display(entry, data, opts)
         end
         entry.display = display
