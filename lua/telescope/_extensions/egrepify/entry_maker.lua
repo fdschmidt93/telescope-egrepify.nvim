@@ -1,7 +1,7 @@
 local ts_utils = require "telescope.utils"
 local egrep_conf = require("telescope._extensions.egrepify.config").values
 
-local os_sep = require "plenary.path".path.sep
+local os_sep = require("plenary.path").path.sep
 local str = require "plenary.strings"
 
 local find_whitespace = function(string_)
@@ -182,7 +182,8 @@ return function(opts)
         local lnum = data["line_number"]
         local col = start + 1
         local entry = {
-          filename = opts.cwd .. os_sep .. filename,
+          filename = filename,
+          path = opts.cwd .. os_sep .. filename,
           lnum = lnum,
           text = text,
           -- byte offset zero-indexed
@@ -207,7 +208,8 @@ return function(opts)
         return {
           value = filename,
           ordinal = filename,
-          filename = opts.cwd .. os_sep .. filename,
+          filename = filename,
+          path = opts.cwd .. os_sep .. filename,
           kind = kind,
           display = function()
             return opts.title_display(filename, data, opts)
