@@ -4,6 +4,17 @@ local egrep_conf = require("telescope._extensions.egrepify.config").values
 local Path = require "plenary.path"
 local str = require "plenary.strings"
 
+local find_whitespace = function(string_)
+  local offset = 0
+  for i = 1, #string_ do
+    if string.sub(string_, i, i) == " " then
+      offset = i
+      break
+    end
+  end
+  return offset
+end
+
 local function collect(tbl)
   local out = {}
   for i = 1, 8 do
@@ -31,12 +42,12 @@ local function line_display(entry, data, opts)
   local col_width = opts.col and (opts.col_width or num_width(entry.col)) or 0
   if opts.lnum then
     lnum = type(opts.lnum_width) == "number" and str.align_str(tostring(entry.lnum), opts.lnum_width, true)
-        or tostring(entry.lnum)
+      or tostring(entry.lnum)
   end
   local col
   if opts.col then
     col = type(opts.col_width) == "number" and str.align_str(tostring(entry.col), opts.col_width, true)
-        or tostring(entry.col)
+      or tostring(entry.col)
   end
   local display = table.concat(
     collect {
@@ -47,7 +58,7 @@ local function line_display(entry, data, opts)
       [5] = col,
       [6] = col and ":" or nil,
       [7] = (lnum or col) and " " or nil,
-      [8] = entry.ordinal,
+      [8] = entry.text,
     },
     ""
   )
@@ -56,8 +67,8 @@ local function line_display(entry, data, opts)
   local end_ = 0
   -- begin = end_ + 1 to skip the separators
   if opts.title == false then
-    highlights[#highlights + 1] = { { begin, 3 }, devicon_hl }
-    begin = 4
+    begin = find_whitespace(file_devicon)
+    highlights[#highlights + 1] = { { 0, begin }, devicon_hl }
     end_ = #entry.filename + begin
     highlights[#highlights + 1] = { { begin, end_ }, opts.filename_hl }
     begin = end_ + 1
@@ -87,7 +98,7 @@ local function line_display(entry, data, opts)
       end_ = begin + f
     end
     if opts.egrep_hl then
-      highlights[#highlights + 1] = { { end_, end_ + #entry.ordinal }, opts.egrep_hl }
+      highlights[#highlights + 1] = { { end_, end_ + #entry.text }, opts.egrep_hl }
     end
   end
   return display, highlights
@@ -97,19 +108,22 @@ local function title_display(filename, _, opts)
   local display_filename = ts_utils.transform_path({ cwd = opts.cwd }, filename)
   local suffix_ = opts.title_suffix or ""
   local display, hl_group = ts_utils.transform_devicons(display_filename, display_filename .. suffix_, false)
+  local offset = find_whitespace(display)
+  local end_filename = offset + #display_filename
+  local end_suffix = end_filename + #opts.title_suffix
   if hl_group then
     return display,
+      {
+        { { 0, offset }, hl_group },
         {
-          { { 0, 3 }, hl_group },
-          {
-            { 4, 4 + #display_filename },
-            opts.filename_hl,
-          },
-          suffix_ ~= "" and {
-            { 4 + #display_filename, 4 + #display_filename + #opts.title_suffix },
-            opts.title_suffix_hl,
-          } or nil,
-        }
+          { offset, end_filename },
+          opts.filename_hl,
+        },
+        suffix_ ~= "" and {
+          { end_filename, end_suffix },
+          opts.title_suffix_hl,
+        } or nil,
+      }
   else
     return display
   end
@@ -164,13 +178,17 @@ return function(opts)
         text = text:gsub("\n", " ")
         local start = not vim.tbl_isempty(data["submatches"]) and data["submatches"][1]["start"] or 0
         -- local line_displayer = entry_display.create(opts.display_line_create)
+        local filename = data["path"]["text"]
+        local lnum = data["line_number"]
+        local col = start + 1
         local entry = {
           filename = Path:new(opts.cwd, data["path"]["text"]).filename,
-          lnum = data["line_number"],
+          lnum = lnum,
+          text = text,
           -- byte offset zero-indexed
-          col = start + 1,
+          col = col,
           value = data,
-          ordinal = text,
+          ordinal = string.format("%s:%s:%s:%s", filename, lnum, col, text),
           kind = kind,
         }
 
@@ -181,8 +199,8 @@ return function(opts)
         entry.display = display
         return entry
       elseif
-      -- parse beginning of rg output for a file
-          kind == "begin" and opts.title ~= false
+        -- parse beginning of rg output for a file
+        kind == "begin" and opts.title ~= false
       then
         local data = json_line["data"]
         local filename = data["path"]["text"]
