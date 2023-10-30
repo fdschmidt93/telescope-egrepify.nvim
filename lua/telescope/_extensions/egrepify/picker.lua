@@ -23,9 +23,24 @@ local flatten = vim.tbl_flatten
 --- The available configuration options are listed at |telescope-egrepify.picker.PickerConfig|.
 ---@brief ]]
 
+-- ensure picker is accessed where needed (sorter, actions)
+local picker
+
+local empty_sorter = sorters.new {
+  scoring_function = function(_, _, _, entry)
+    if entry.kind == "begin" then
+      picker:_decrement "processed" -- do not account for title in matches
+    end
+    return 1
+  end,
+}
+
 -- sorting_strategy "descending" puts title "after" matches, while "ascending" has title "before" matches
 local descending_sorter = sorters.new {
-  scoring_function = function()
+  scoring_function = function(_, _, _, entry)
+    if entry.kind == "begin" then
+      picker:_decrement "processed" -- do not account for title in matches
+    end
     -- telescope does not manage entries if score is 1
     -- required to activate `tiebreak`
     return 0
@@ -152,9 +167,8 @@ function Picker.picker(opts)
   local sorting_strategy = vim.F.if_nil(opts.sorting_strategy, require("telescope.config").values.sorting_strategy)
   local is_descending = sorting_strategy == "descending"
   local tiebreak = is_descending and descending_tiebreak or nil
-  local sorter = is_descending and descending_sorter or sorters.empty()
+  local sorter = is_descending and descending_sorter or empty_sorter
 
-  local picker -- so we can refer to picker in actions.close:enhance
   picker = pickers.new(opts, {
     prompt_title = "Live Grep",
     finder = live_grepper,
