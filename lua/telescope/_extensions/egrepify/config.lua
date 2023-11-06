@@ -119,8 +119,17 @@ config.values = _TelescopeEgrepifyConfig
 
 config.setup = function(opts)
   -- TODO maybe merge other keys as well from telescope.config
-  config.values.mappings =
-    vim.tbl_deep_extend("force", config.values.mappings, require("telescope.config").values.mappings)
+  local telescope_mappings = require("telescope.config").values.mappings
+  for mode, tbl in pairs(telescope_mappings) do
+    if not config.values[mode] then
+      config.values[mode] = {}
+    end
+    for key, action in pairs(tbl) do
+      if not config.values[mode][key] then
+        config.values[mode][key] = action
+      end
+    end
+  end
   config.values = vim.tbl_deep_extend("force", config.values, opts)
 end
 
