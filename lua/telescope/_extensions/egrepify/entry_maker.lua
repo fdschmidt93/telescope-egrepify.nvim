@@ -183,7 +183,8 @@ return function(opts)
         local col = start + 1
         local entry = {
           filename = filename,
-          path = opts.cwd .. os_sep .. filename,
+          -- rg --json returns absolute paths when expl. directories are grepped
+          path = opts.searches_dirs and filename or opts.cwd .. os_sep .. filename,
           lnum = lnum,
           text = text,
           col = col,
@@ -207,7 +208,8 @@ return function(opts)
           value = filename,
           ordinal = filename,
           filename = filename,
-          path = opts.cwd .. os_sep .. filename,
+          -- rg --json returns absolute paths when expl. directories are grepped
+          path = opts.searches_dirs and filename or opts.cwd .. os_sep .. filename,
           kind = kind,
           display = function()
             return opts.title_display(filename, data, opts)
