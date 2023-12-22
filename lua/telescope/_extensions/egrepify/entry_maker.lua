@@ -58,7 +58,7 @@ local function line_display(entry, data, opts)
       [5] = col,
       [6] = col and ":" or nil,
       [7] = (lnum or col) and " " or nil,
-      [8] = entry.text,
+      [8] = string.gsub(entry.text, "\r", ""),
     },
     ""
   )
