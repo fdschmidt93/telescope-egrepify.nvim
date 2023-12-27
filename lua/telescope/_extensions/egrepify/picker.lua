@@ -119,6 +119,18 @@ function Picker.picker(opts)
   local open_files = vim.F.if_nil(opts.grep_open_files, egrep_conf.grep_open_files)
       and egrep_utils._get_open_files(opts.cwd)
     or {}
+
+  local search_list = #open_files > 0 and open_files or search_dirs
+  -- rg --json returns absolute paths once a directory is in search list
+  local searches_dirs = false
+  for _, path in ipairs(search_list) do
+    if vim.fn.isdirectory(path) == 1 then
+      searches_dirs = true
+      break
+    end
+  end
+  ---@diagnostic disable-next-line: inject-field
+  opts.searches_dirs = searches_dirs -- passthrough to entry maker
   local args = flatten { vimgrep_arguments, { "--json" } }
 
   local live_grepper = finders.new_job(function(prompt)
@@ -158,8 +170,6 @@ function Picker.picker(opts)
     else -- matches everything in between sub-tokens and permutations
       prompt = egrep_utils.permutations(tokens)
     end
-
-    local search_list = #open_files > 0 and open_files or search_dirs
 
     return flatten { args, prompt_args, "--", prompt, search_list }
   end, egrep_entry_maker(opts), opts.max_results, opts.cwd)
