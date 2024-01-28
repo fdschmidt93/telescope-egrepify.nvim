@@ -185,6 +185,7 @@ return function(opts)
           filename = filename,
           -- rg --json returns absolute paths when expl. directories are grepped
           path = opts.searches_dirs and filename or opts.cwd .. os_sep .. filename,
+          cwd = opts.cwd,
           lnum = lnum,
           text = text,
           col = col,
@@ -210,6 +211,7 @@ return function(opts)
           filename = filename,
           -- rg --json returns absolute paths when expl. directories are grepped
           path = opts.searches_dirs and filename or opts.cwd .. os_sep .. filename,
+          cwd = opts.cwd,
           kind = kind,
           display = function()
             return opts.title_display(filename, data, opts)
