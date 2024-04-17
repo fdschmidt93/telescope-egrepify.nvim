@@ -64,7 +64,7 @@ end
 ---@field use_prefixes boolean use prefixes in prompt, toggleable with <C-z> (default: true)
 ---@field AND boolean search with fzf-like AND logic to ordered sub-tokens of prompt
 ---@field permutations boolean search permutations of sub-tokens of prompt, implies AND true
----@field hidden boolean search hidden files (default: false)
+---@field hidden boolean search hidden files, toggleable with <C-h> (true if corresponding flags are set in `vimgrep_arguments`)
 ---@field prefixes table prefixes for `rg` input, see |telescope-egrepify.prefix|
 ---@field filename_hl string hl for title (default: `EgrepifyFile` w/ link to `Title`)
 ---@field title boolean filename as title, false to inline (default: true)
@@ -204,6 +204,7 @@ function Picker.picker(opts)
             cached_opts.use_prefixes = picker.use_prefixes
             cached_opts.AND = picker.AND
             cached_opts.permutations = picker.permutations
+            cached_opts.hidden = picker.hidden
           end
         end,
       }
@@ -217,6 +218,7 @@ function Picker.picker(opts)
   picker.AND = vim.F.if_nil(opts.AND, egrep_conf.AND)
   -- matches everything in between sub-tokens and permutations
   picker.permutations = vim.F.if_nil(opts.permutations, egrep_conf.permutations)
+  picker.hidden = vim.F.if_nil(opts.hidden, egrep_conf.hidden)
 
   if picker.permutations then
     picker.AND = true

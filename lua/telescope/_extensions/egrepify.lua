@@ -145,6 +145,22 @@ local egrepify = function(opts)
     end
   end
 
+  local hidden_opts = { "--hidden", "--no-ignore", "-u", "-uu", "-uuu" }
+  local ignore_opts = { "--no-hidden", "--ignore" }
+  if popts.vimgrep_arguments then
+    for i = #popts.vimgrep_arguments, 1, -1 do
+      if vim.tbl_contains(hidden_opts, popts.vimgrep_arguments[i]) then
+        popts.hidden = true
+        break
+      end
+      if vim.tbl_contains(ignore_opts, popts.vimgrep_arguments[i]) then
+        popts.hidden = false
+        break
+      end
+    end
+    popts.hidden = popts.hidden or false
+  end
+
   egrep_picker(popts)
 end
 
