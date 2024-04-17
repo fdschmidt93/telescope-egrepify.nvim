@@ -64,6 +64,7 @@ end
 ---@field use_prefixes boolean use prefixes in prompt, toggleable with <C-z> (default: true)
 ---@field AND boolean search with fzf-like AND logic to ordered sub-tokens of prompt
 ---@field permutations boolean search permutations of sub-tokens of prompt, implies AND true
+---@field hidden boolean search hidden files (default: false)
 ---@field prefixes table prefixes for `rg` input, see |telescope-egrepify.prefix|
 ---@field filename_hl string hl for title (default: `EgrepifyFile` w/ link to `Title`)
 ---@field title boolean filename as title, false to inline (default: true)
@@ -169,6 +170,13 @@ function Picker.picker(opts)
       end
     else -- matches everything in between sub-tokens and permutations
       prompt = egrep_utils.permutations(tokens)
+    end
+    if current_picker and current_picker.hidden then
+      prompt_args[#prompt_args + 1] = "--no-ignore"
+      prompt_args[#prompt_args + 1] = "--hidden"
+    else
+      prompt_args[#prompt_args + 1] = "--ignore"
+      prompt_args[#prompt_args + 1] = "--no-hidden"
     end
 
     return flatten { args, prompt_args, "--", prompt, search_list }
