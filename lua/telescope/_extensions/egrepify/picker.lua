@@ -7,6 +7,7 @@ local sorters = require "telescope.sorters"
 local conf = require("telescope.config").values
 local egrep_conf = require("telescope._extensions.egrepify.config").values
 local actions = require "telescope.actions"
+local previewers = require "telescope.previewers"
 
 local flatten = vim.tbl_flatten
 
@@ -186,7 +187,13 @@ function Picker.picker(opts)
     -- slight hack that should be simple and work well in practice
     -- descending puts title "after" matches, while ascending has title "before" matches
     default_selection_index = is_descending and 1 or 2,
-    previewer = conf.grep_previewer(opts),
+    previewer = previewers.new_buffer_previewer {
+      define_preview = function (self, entry, status)
+        if entry.lnum then
+          conf.grep_previewer(opts).preview_fn(self, entry, status)
+        end
+      end
+    },
     sorter = sorter,
     tiebreak = tiebreak,
     attach_mappings = function()
