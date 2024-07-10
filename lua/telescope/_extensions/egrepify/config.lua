@@ -27,7 +27,7 @@ _TelescopeEgrepifyConfig = {
       ["<C-z>"] = egrep_actions.toggle_prefixes,
       ["<C-a>"] = egrep_actions.toggle_and,
       ["<C-r>"] = egrep_actions.toggle_permutations,
-      ["<c-space>"] = actions.to_fuzzy_refine
+      ["<c-space>"] = actions.to_fuzzy_refine,
     },
   },
   prefixes = {
@@ -66,6 +66,26 @@ _TelescopeEgrepifyConfig = {
           local entry = action_state.get_selected_entry()
           if entry and entry.kind == "begin" then
             actions[key](prompt_bufnr)
+            -- HACK below ensures that the cursor gets moved / line gets highlighted when initially jumping
+            -- over a "begin"  entry kind which only comprises the "title"
+            -- by ensuring extmark (i.e. TelescopePreviewLine) was set
+            -- Otherwise no reliable way of determining whether we still need to refresh preview
+            local current_picker = action_state.get_current_picker(prompt_bufnr)
+            if current_picker.layout.preview then
+              local winid = current_picker.layout.preview.winid
+              if vim.api.nvim_win_is_valid(winid) then
+                local bufnr = vim.api.nvim_win_get_buf(winid)
+                local ns_previewer = vim.api.nvim_create_namespace "telescope.previewers"
+                vim.wait(200, function()
+                  local extmarks = vim.api.nvim_buf_get_extmarks(bufnr, ns_previewer, 0, -1, {})
+                  if vim.tbl_isempty(extmarks) then
+                    current_picker:refresh_previewer()
+                    return false
+                  end
+                  return true
+                end, 20)
+              end
+            end
           end
         end,
       }
