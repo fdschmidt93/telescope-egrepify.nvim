@@ -73,6 +73,7 @@ end
 ---@field lnum_hl string lnum hl [`EgrepifyLnum`, links to `Constant`]
 ---@field col boolean include col in result entry
 ---@field col_hl string col hl (default: `EgrepifyCol`, links to `Constant`)
+---@field results_ts_hl boolean highlight results entries with treesitter, may increase latency!
 ---@field sorting_strategy string see |telescope.defaults.sorting_strategy|, "descending" has slight perf. hit
 
 local Picker = {}

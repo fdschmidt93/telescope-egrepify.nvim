@@ -31,7 +31,100 @@ local function num_width(num)
   return math.floor(math.log10(num) + 1)
 end
 
-local function line_display(entry, data, opts)
+--- Load TS parser and return buffer highlights if available.
+---@param bufnr number: buffer number
+---@param lang string: filetype of buffer
+---@return table: { [lnum] = { [columns ...] = "HighlightGroup" } }
+local get_buffer_highlights = function(bufnr, lang)
+  local has_parser = pcall(vim.treesitter.language.add, lang)
+  local root
+  if lang and has_parser then
+    local parser = vim.treesitter.get_parser(bufnr, lang)
+    root = parser:parse()[1]:root()
+  end
+  if not root then
+    return {}
+  end
+  local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+  local query = vim.treesitter.query.get(lang, "highlights")
+  local line_highlights = setmetatable({}, {
+    __index = function(t, k)
+      local obj = {}
+      rawset(t, k, obj)
+      return obj
+    end,
+  })
+  if query then
+    for id, node in query:iter_captures(root, bufnr, 0, -1) do
+      local hl = "@" .. query.captures[id]
+      if hl and type(hl) ~= "number" then
+        local row1, col1, row2, col2 = node:range()
+
+        if row1 == row2 then
+          local row = row1 + 1
+
+          for index = col1, col2 do
+            line_highlights[row][index] = hl
+          end
+        else
+          local row = row1 + 1
+          for index = col1, #lines[row] do
+            line_highlights[row][index] = hl
+          end
+
+          while row < row2 + 1 do
+            row = row + 1
+
+            for index = 0, #(lines[row] or {}) do
+              line_highlights[row][index] = hl
+            end
+          end
+        end
+      end
+    end
+  end
+  return line_highlights
+end
+
+---@param path string absolute path to file
+---@return table: { [lnum] = { [columns ...] = "HighlightGroup" } }
+local get_ts_highlights = function(path)
+  local ei = vim.go.eventignore
+  vim.go.eventignore = "all"
+  local highlights = {}
+  local lang = vim.filetype.match { filename = path }
+  if lang then
+    local bufnr, loaded
+    -- check if buffer is opened
+    local buffers = {}
+    for _, b in ipairs(vim.api.nvim_list_bufs()) do
+      if vim.api.nvim_buf_get_name(b) == path then
+        buffers[#buffers + 1] = b
+      end
+    end
+    if #buffers == 1 then
+      bufnr = buffers[1]
+    else
+      -- TODO: maybe change with reading file into temporary buffer ala plenary
+      bufnr = vim.fn.bufadd(path)
+      vim.fn.bufload(bufnr)
+      -- trying to preempt issues
+      pcall(vim.api.nvim_buf_set_name, bufnr, path)
+      vim.go.eventignore = ei
+      loaded = true
+    end
+    if bufnr then
+      highlights = get_buffer_highlights(bufnr, lang)
+      if loaded then
+        vim.api.nvim_buf_delete(bufnr, { force = true })
+      end
+    end
+  end
+  vim.go.eventignore = ei
+  return highlights
+end
+
+local function line_display(entry, data, opts, ts_highlights)
   entry = entry or {}
   local file_devicon, devicon_hl
   if opts.title == false then
@@ -86,19 +179,30 @@ local function line_display(entry, data, opts)
   if lnum or col then
     begin = begin + 1
   end
+
+  local covered_ids = {}
   if not vim.tbl_isempty(data["submatches"]) then
     local matches = data["submatches"]
     for i = 1, #matches do
       local submatch = matches[i]
       local s, f = submatch["start"], submatch["end"]
-      if opts.egrep_hl then
-        highlights[#highlights + 1] = { { begin, begin + s }, opts.egrep_hl }
-      end
-      highlights[#highlights + 1] = { { begin + s, begin + f }, "TelescopeMatching" }
       end_ = begin + f
+      highlights[#highlights + 1] = { { begin + s, end_ }, "TelescopeMatching" }
+      for j = s, f - 1 do
+        covered_ids[j] = true
+      end
     end
-    if opts.egrep_hl then
-      highlights[#highlights + 1] = { { end_, end_ + #entry.text }, opts.egrep_hl }
+  end
+  if opts.results_ts_hl then
+    if ts_highlights[entry.path] == nil then
+      ts_highlights[entry.path] = get_ts_highlights(entry.path)
+    end
+    if ts_highlights[entry.path] and ts_highlights[entry.path][entry.lnum] then
+      for ts_col, hl in pairs(ts_highlights[entry.path][entry.lnum]) do
+        if not covered_ids[ts_col] then
+          highlights[#highlights + 1] = { { begin + ts_col, begin + ts_col + 1 }, hl }
+        end
+      end
     end
   end
   return display, highlights
@@ -138,6 +242,7 @@ return function(opts)
   opts.lnum_hl = vim.F.if_nil(opts.lnum_hl, egrep_conf.lnum_hl)
   opts.col = vim.F.if_nil(opts.col, egrep_conf.col)
   opts.col_hl = vim.F.if_nil(opts.col_hl, egrep_conf.col_hl)
+  opts.results_ts_hl = vim.F.if_nil(opts.results_ts_hl, egrep_conf.results_ts_hl)
   local lnum_col_width = 1
   if opts.lnum then
     lnum_col_width = lnum_col_width + 4
@@ -157,6 +262,7 @@ return function(opts)
     items = items,
   })
   opts.title_display = vim.F.if_nil(opts.title_display, title_display)
+  local ts_highlights = {}
 
   return function(stream)
     local json_line = vim.json.decode(stream)
@@ -195,7 +301,7 @@ return function(opts)
         }
 
         local display = function()
-          return line_display(entry, data, opts)
+          return line_display(entry, data, opts, ts_highlights)
         end
         entry.display = display
         return entry
