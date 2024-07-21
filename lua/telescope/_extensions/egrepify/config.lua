@@ -28,7 +28,7 @@ _TelescopeEgrepifyConfig = {
       ["<C-z>"] = egrep_actions.toggle_prefixes,
       ["<C-a>"] = egrep_actions.toggle_and,
       ["<C-r>"] = egrep_actions.toggle_permutations,
-      ["<c-space>"] = actions.to_fuzzy_refine
+      ["<c-space>"] = actions.to_fuzzy_refine,
     },
   },
   prefixes = {
@@ -65,8 +65,13 @@ _TelescopeEgrepifyConfig = {
       actions[key]:enhance {
         post = function()
           local entry = action_state.get_selected_entry()
+
           if entry and entry.kind == "begin" then
-            actions[key](prompt_bufnr)
+            if entry.index == 1 then
+              actions["move_selection_next"](prompt_bufnr)
+            else
+              actions[key](prompt_bufnr)
+            end
           end
         end,
       }
