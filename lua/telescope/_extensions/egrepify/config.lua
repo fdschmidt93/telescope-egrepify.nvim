@@ -22,6 +22,7 @@ _TelescopeEgrepifyConfig = {
   title_suffix = title_suffix,
   title_suffix_hl = "EgrepifySuffix",
   grep_open_files = false,
+  results_ts_hl = false,
   mappings = {
     i = {
       ["<C-z>"] = egrep_actions.toggle_prefixes,

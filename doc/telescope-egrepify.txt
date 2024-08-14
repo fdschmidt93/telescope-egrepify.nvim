@@ -122,6 +122,7 @@ PickerConfig                                                      *PickerConfig*
         {lnum_hl}            (string)    lnum hl [`EgrepifyLnum`, links to `Constant`]
         {col}                (boolean)   include col in result entry
         {col_hl}             (string)    col hl (default: `EgrepifyCol`, links to `Constant`)
+        {results_ts_hl}      (boolean)   highlight results entries with treesitter, may increase latency!
         {sorting_strategy}   (string)    see |telescope.defaults.sorting_strategy|, "descending" has slight perf. hit
 
 

@@ -7,6 +7,7 @@
 - Extensible prefix-based CLI parsing for `ripgrep`, e.g. by default `#md,lua sorter` would look for sorter in files with `md` or `lua` extensions
 - Better (opinionated) defaults like `AND` for tokens in prompt: `this here` expands to "this*.here" in regex matching this, any characters in between, __and__ here
 - Custom entry maker to parse `ripgrep` json to separate filenames as "section titles" (inspired by [consult.el](https://github.com/minad/consult)), configure line and column numbers, and perform accurate line highlighting
+- Opt-in results highlighting with treesitter (needs `results_ts_hl = true`)
 
 ## Motivation
 
@@ -121,6 +122,7 @@ require("telescope").setup {
       col_hl = "EgrepifyCol",         -- default, not required, links to `Constant`
       title = true,                   -- default, not required, show filename as title rather than inline
       filename_hl = "EgrepifyFile",   -- default, not required, links to `Title`
+      results_ts_hl = false,          -- set to true if you want results ts highlighting, may increase latency!
       -- suffix = long line, see screenshot
       -- EXAMPLE ON HOW TO ADD PREFIX!
       prefixes = {
