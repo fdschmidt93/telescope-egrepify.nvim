@@ -211,7 +211,7 @@ end
 local function title_display(filename, _, opts)
   local display_filename = ts_utils.transform_path({ cwd = opts.cwd }, filename)
   local suffix_ = opts.title_suffix or ""
-  local display, hl_group = ts_utils.transform_devicons(display_filename, display_filename .. suffix_, false)
+  local display, hl_group = ts_utils.transform_devicons(filename, display_filename .. suffix_, false)
   local offset = find_whitespace(display)
   local end_filename = offset + #display_filename
   local end_suffix = end_filename + #opts.title_suffix
