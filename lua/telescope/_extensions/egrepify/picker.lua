@@ -203,6 +203,17 @@ function Picker.picker(opts)
       return true
     end,
   })
+  local preview_fn = picker.previewer.preview
+  picker.previewer.preview = function(previewer, entry, status)
+    if entry then
+      if entry.kind ~= "begin" then
+        preview_fn(previewer, entry, status)
+      end
+    else
+      -- required to clear preview in case there is no entry
+      preview_fn(previewer, entry, status)
+    end
+  end
   -- caching opts to be able to remove `title` from opts for entry maker for fuzzy refine
   picker._opts = opts
   picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, egrep_conf.use_prefixes)
