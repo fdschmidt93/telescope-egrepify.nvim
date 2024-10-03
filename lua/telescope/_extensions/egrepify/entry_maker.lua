@@ -26,6 +26,14 @@ local function collect(tbl)
   return out
 end
 
+local function has_ts_parser(lang)
+  if vim.fn.has "nvim-0.11" == 1 then
+    return vim.treesitter.language.add(lang)
+  else
+    return pcall(vim.treesitter.language.add, lang)
+  end
+end
+
 -- get the string width of a number without converting to string
 local function num_width(num)
   return math.floor(math.log10(num) + 1)
@@ -36,7 +44,7 @@ end
 ---@param lang string: filetype of buffer
 ---@return table: { [lnum] = { [columns ...] = "HighlightGroup" } }
 local get_buffer_highlights = function(bufnr, lang)
-  local has_parser = pcall(vim.treesitter.language.add, lang)
+  local has_parser = has_ts_parser(lang)
   local root
   if lang and has_parser then
     local parser = vim.treesitter.get_parser(bufnr, lang)
