@@ -122,7 +122,7 @@ require("telescope").setup {
       col_hl = "EgrepifyCol",         -- default, not required, links to `Constant`
       title = true,                   -- default, not required, show filename as title rather than inline
       filename_hl = "EgrepifyFile",   -- default, not required, links to `Title`
-      results_ts_hl = false,          -- set to true if you want results ts highlighting, may increase latency!
+      results_ts_hl = true,           -- set to false if you experience latency issues!
       -- suffix = long line, see screenshot
       -- EXAMPLE ON HOW TO ADD PREFIX!
       prefixes = {
