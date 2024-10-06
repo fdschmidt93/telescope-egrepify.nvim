@@ -201,18 +201,6 @@ local function line_display(entry, data, opts, ts_highlights)
       end
     end
   end
-  if opts.results_ts_hl then
-    if ts_highlights[entry.path] == nil then
-      ts_highlights[entry.path] = get_ts_highlights(entry.path)
-    end
-    if ts_highlights[entry.path] and ts_highlights[entry.path][entry.lnum] then
-      for ts_col, hl in pairs(ts_highlights[entry.path][entry.lnum]) do
-        if not covered_ids[ts_col] then
-          highlights[#highlights + 1] = { { begin + ts_col, begin + ts_col + 1 }, hl }
-        end
-      end
-    end
-  end
   return display, highlights
 end
 
