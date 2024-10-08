@@ -217,7 +217,6 @@ function Picker.picker(opts)
   end
   local entry_adder = picker.entry_adder
   local regions = {}
-  local valid_lines = {}
   picker.entry_adder = function(picker_, index, entry, _, insert)
     entry_adder(picker_, index, entry, _, insert)
     if not entry.kind == "match" then
@@ -245,13 +244,7 @@ function Picker.picker(opts)
       end
       first_pos = first_pos - 1
       -- clear row for FT that used to be in that row
-      if valid_lines[row] and regions[valid_lines[row][1]] then
-        table.remove(regions[valid_lines[row][1]], valid_lines[row][2])
-      end
       table.insert(regions[ft], { { row, first_pos, row, line:len() } })
-      local offset = #regions[ft]
-      -- store filetype and table offset for line that may have to be invalidated
-      valid_lines[row] = { ft, offset }
       TSInjector.attach(picker_.results_bufnr, regions)
     end
   end
