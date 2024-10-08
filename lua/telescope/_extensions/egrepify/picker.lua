@@ -219,6 +219,10 @@ function Picker.picker(opts)
   local regions = {}
   picker.entry_adder = function(picker_, index, entry, _, insert)
     entry_adder(picker_, index, entry, _, insert)
+    if not opts.results_ts_hl then
+      return
+    end
+
     if not entry.kind == "match" then
       return
     end
