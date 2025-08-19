@@ -204,15 +204,17 @@ function Picker.picker(opts)
       return true
     end,
   })
-  local preview_fn = picker.previewer.preview
-  picker.previewer.preview = function(previewer, entry, status)
-    if entry then
-      if entry.kind ~= "begin" then
+  if picker.previewer then
+    local preview_fn = picker.previewer.preview
+    picker.previewer.preview = function(previewer, entry, status)
+      if entry then
+        if entry.kind ~= "begin" then
+          preview_fn(previewer, entry, status)
+        end
+      else
+        -- required to clear preview in case there is no entry
         preview_fn(previewer, entry, status)
       end
-    else
-      -- required to clear preview in case there is no entry
-      preview_fn(previewer, entry, status)
     end
   end
   local entry_adder = picker.entry_adder
