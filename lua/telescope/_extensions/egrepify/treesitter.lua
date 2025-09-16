@@ -33,7 +33,9 @@ function M.setup()
 
   vim.api.nvim_set_decoration_provider(ns, {
     on_win = wrap "_on_win",
-    on_line = wrap "_on_line",
+    on_line = vim.fn.has "nvim-0.12" and function(_, win, buf, row)
+      wrap "_on_range"(_, win, buf, row, 0, row + 1, 0)
+    end or wrap "_on_line",
   })
 
   vim.api.nvim_create_autocmd("BufWipeout", {
