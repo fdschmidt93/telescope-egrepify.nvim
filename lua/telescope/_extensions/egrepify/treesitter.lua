@@ -32,7 +32,7 @@ function M.setup()
   M.did_setup = true
 
   local on_line
-  if vim.fn.has "nvim-0.12" then
+  if vim.fn.has "nvim-0.12" == 1 then
     local on_range = wrap "_on_range"
     on_line = function(_, win, buf, row)
       return on_range(_, win, buf, row, 0, row + 1, 0)
