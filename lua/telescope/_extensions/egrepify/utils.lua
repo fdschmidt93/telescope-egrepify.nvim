@@ -38,7 +38,9 @@ M.prefix_handler = function(prompt_tokens, prefix, prefix_opts)
       local token_str = token:sub(prefix_width + 1, -1)
       token_str = prefix_opts.cb and prefix_opts.cb(token_str) or token_str
       if not token_str or token_str == "" then
-        args[#args + 1] = string.format([[--%s]], prefix_opts.flag)
+        for flg in prefix_opts.flag:gmatch("%S+") do
+          args[#args + 1] = string.format([[--%s]], flg)
+        end
       else
         args[#args + 1] = string.format([[--%s=%s]], prefix_opts.flag, token_str)
       end
