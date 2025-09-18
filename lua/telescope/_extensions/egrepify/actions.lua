@@ -55,5 +55,16 @@ function egrep_actions.toggle_permutations(prompt_bufnr)
   current_picker:refresh()
 end
 
+--- Toggle the use of hidden files option in the picker
+--- @param prompt_bufnr number: The prompt bufnr
+function egrep_actions.toggle_hidden(prompt_bufnr)
+  local current_picker = action_state.get_current_picker(prompt_bufnr)
+  current_picker.hidden = not current_picker.hidden
+  local msg = current_picker.hidden and "Hidden files enabled" or "Hidden files disabled"
+  dismiss_notifications()
+  egrep_utils.notify("picker", { msg = msg, level = "INFO" })
+  current_picker:refresh()
+end
+
 egrep_actions = transform_mod(egrep_actions)
 return egrep_actions
