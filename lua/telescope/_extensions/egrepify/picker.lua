@@ -9,8 +9,6 @@ local egrep_conf = require("telescope._extensions.egrepify.config").values
 local actions = require "telescope.actions"
 local TSInjector = require "telescope._extensions.egrepify.treesitter"
 
-local flatten = vim.tbl_flatten
-
 ---@mod telescope-egrepify.picker Picker
 ---@brief [[
 ---You can access the picker with defaults and user-configuration by calling
@@ -133,7 +131,7 @@ function Picker.picker(opts)
   end
   ---@diagnostic disable-next-line: inject-field
   opts.searches_dirs = searches_dirs -- passthrough to entry maker
-  local args = flatten { vimgrep_arguments, { "--json" } }
+  local args = vim.iter({ vimgrep_arguments, { "--json" } }):flatten(math.huge):totable()
 
   local live_grepper = finders.new_job(function(prompt)
     if not prompt or prompt == "" then
@@ -173,7 +171,7 @@ function Picker.picker(opts)
       prompt = egrep_utils.permutations(tokens)
     end
 
-    return flatten { args, prompt_args, "--", prompt, search_list }
+    return vim.iter({ args, prompt_args, "--", prompt, search_list }):flatten(math.huge):totable()
   end, egrep_entry_maker(opts), opts.max_results, opts.cwd)
 
   local sorting_strategy = vim.F.if_nil(opts.sorting_strategy, require("telescope.config").values.sorting_strategy)
