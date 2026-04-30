@@ -184,7 +184,8 @@ function Picker.picker(opts)
     finder = live_grepper,
     -- slight hack that should be simple and work well in practice
     -- descending puts title "after" matches, while ascending has title "before" matches
-    default_selection_index = is_descending and 1 or 2,
+    -- when title is disabled, no "begin" entries exist, so default to index 1
+    default_selection_index = is_descending and 1 or (vim.F.if_nil(opts.title, egrep_conf.title) and 2 or 1),
     previewer = conf.grep_previewer(opts),
     sorter = sorter,
     tiebreak = tiebreak,
