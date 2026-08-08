@@ -1,5 +1,7 @@
 local M = {}
 
+local if_nil = vim.nonnil or vim.F.if_nil
+
 ---Repeat `char` `N` times
 ---@param char string: character to repeat
 ---@param N number: number of times to repeat
@@ -27,7 +29,7 @@ end
 ---@param prompt_tokens table: the prompt tokens
 ---@param prefix string: the prefix to look format
 ---@param prefix_opts table: the prefix options (flag: string and cb: function?)
----@return table, table: prompt tokens and extraced flag
+---@return table, table: prompt tokens and extracted flag
 M.prefix_handler = function(prompt_tokens, prefix, prefix_opts)
   local prefix_width = #prefix
   local indices = {}
@@ -57,7 +59,7 @@ end
 M.notify = function(funname, opts)
   -- avoid circular require
   local egrep_config = require "telescope._extensions.egrepify.config"
-  local quiet = vim.F.if_nil(opts.quiet, egrep_config.values.quiet)
+  local quiet = if_nil(opts.quiet, egrep_config.values.quiet)
   if not quiet then
     local level = vim.log.levels[opts.level]
     if not level then

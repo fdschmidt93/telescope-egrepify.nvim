@@ -9,6 +9,8 @@ local egrep_conf = require("telescope._extensions.egrepify.config").values
 local actions = require "telescope.actions"
 local TSInjector = require "telescope._extensions.egrepify.treesitter"
 
+local if_nil = vim.nonnil or vim.F.if_nil
+
 ---@mod telescope-egrepify.picker Picker
 ---@brief [[
 ---You can access the picker with defaults and user-configuration by calling
@@ -92,7 +94,7 @@ end
 function Picker.picker(opts)
   opts = opts or {}
 
-  local search_dirs = vim.F.if_nil(opts.search_dirs, {})
+  local search_dirs = if_nil(opts.search_dirs, {})
 
   if search_dirs then
     for i, path in ipairs(search_dirs) do
@@ -116,8 +118,7 @@ function Picker.picker(opts)
 
   local vimgrep_arguments = opts.vimgrep_arguments or conf.vimgrep_arguments
   opts.cwd = opts.cwd and vim.fn.expand(opts.cwd) or vim.loop.cwd()
-  local open_files = vim.F.if_nil(opts.grep_open_files, egrep_conf.grep_open_files)
-      and egrep_utils._get_open_files(opts.cwd)
+  local open_files = if_nil(opts.grep_open_files, egrep_conf.grep_open_files) and egrep_utils._get_open_files(opts.cwd)
     or {}
 
   local search_list = #open_files > 0 and open_files or search_dirs
@@ -174,7 +175,7 @@ function Picker.picker(opts)
     return vim.iter({ args, prompt_args, "--", prompt, search_list }):flatten(math.huge):totable()
   end, egrep_entry_maker(opts), opts.max_results, opts.cwd)
 
-  local sorting_strategy = vim.F.if_nil(opts.sorting_strategy, require("telescope.config").values.sorting_strategy)
+  local sorting_strategy = if_nil(opts.sorting_strategy, require("telescope.config").values.sorting_strategy)
   local is_descending = sorting_strategy == "descending"
   local tiebreak = is_descending and descending_tiebreak or nil
   local sorter = is_descending and descending_sorter or empty_sorter
@@ -185,7 +186,7 @@ function Picker.picker(opts)
     -- slight hack that should be simple and work well in practice
     -- descending puts title "after" matches, while ascending has title "before" matches
     -- when title is disabled, no "begin" entries exist, so default to index 1
-    default_selection_index = is_descending and 1 or (vim.F.if_nil(opts.title, egrep_conf.title) and 2 or 1),
+    default_selection_index = is_descending and 1 or (if_nil(opts.title, egrep_conf.title) and 2 or 1),
     previewer = conf.grep_previewer(opts),
     sorter = sorter,
     tiebreak = tiebreak,
@@ -269,11 +270,11 @@ function Picker.picker(opts)
 
   -- caching opts to be able to remove `title` from opts for entry maker for fuzzy refine
   picker._opts = opts
-  picker.use_prefixes = vim.F.if_nil(opts.use_prefixes, egrep_conf.use_prefixes)
+  picker.use_prefixes = if_nil(opts.use_prefixes, egrep_conf.use_prefixes)
   -- matches everything in between sub-tokens of prompt akin to fzf
-  picker.AND = vim.F.if_nil(opts.AND, egrep_conf.AND)
+  picker.AND = if_nil(opts.AND, egrep_conf.AND)
   -- matches everything in between sub-tokens and permutations
-  picker.permutations = vim.F.if_nil(opts.permutations, egrep_conf.permutations)
+  picker.permutations = if_nil(opts.permutations, egrep_conf.permutations)
 
   if picker.permutations then
     picker.AND = true

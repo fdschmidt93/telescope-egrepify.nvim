@@ -4,6 +4,8 @@ local egrep_conf = require("telescope._extensions.egrepify.config").values
 local os_sep = require("plenary.path").path.sep
 local str = require "plenary.strings"
 
+local if_nil = vim.nonnil or vim.F.if_nil
+
 local find_whitespace = function(string_)
   local offset = 0
   for i = 1, #string_ do
@@ -231,14 +233,14 @@ end
 
 return function(opts)
   opts = opts or {}
-  opts.filename_hl = vim.F.if_nil(opts.filename_hl, egrep_conf.filename_hl)
-  opts.title_suffix = vim.F.if_nil(opts.title_suffix, egrep_conf.title_suffix)
-  opts.title_suffix_hl = vim.F.if_nil(opts.title_suffix_hl, egrep_conf.title_suffix_hl)
-  opts.lnum = vim.F.if_nil(opts.lnum, egrep_conf.lnum)
-  opts.lnum_hl = vim.F.if_nil(opts.lnum_hl, egrep_conf.lnum_hl)
-  opts.col = vim.F.if_nil(opts.col, egrep_conf.col)
-  opts.col_hl = vim.F.if_nil(opts.col_hl, egrep_conf.col_hl)
-  opts.results_ts_hl = vim.F.if_nil(opts.results_ts_hl, egrep_conf.results_ts_hl)
+  opts.filename_hl = if_nil(opts.filename_hl, egrep_conf.filename_hl)
+  opts.title_suffix = if_nil(opts.title_suffix, egrep_conf.title_suffix)
+  opts.title_suffix_hl = if_nil(opts.title_suffix_hl, egrep_conf.title_suffix_hl)
+  opts.lnum = if_nil(opts.lnum, egrep_conf.lnum)
+  opts.lnum_hl = if_nil(opts.lnum_hl, egrep_conf.lnum_hl)
+  opts.col = if_nil(opts.col, egrep_conf.col)
+  opts.col_hl = if_nil(opts.col_hl, egrep_conf.col_hl)
+  opts.results_ts_hl = if_nil(opts.results_ts_hl, egrep_conf.results_ts_hl)
   local lnum_col_width = 1
   if opts.lnum then
     lnum_col_width = lnum_col_width + 4
@@ -253,11 +255,11 @@ return function(opts)
   end
   items[#items + 1] = { remaining = true }
 
-  opts.display_line_create = vim.F.if_nil(opts.display_line_create, {
+  opts.display_line_create = if_nil(opts.display_line_create, {
     separator = (opts.lnum or opts.col) and " " or "",
     items = items,
   })
-  opts.title_display = vim.F.if_nil(opts.title_display, title_display)
+  opts.title_display = if_nil(opts.title_display, title_display)
   local ts_highlights = {}
 
   return function(stream)
